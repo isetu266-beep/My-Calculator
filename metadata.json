@@ -1,0 +1,6 @@
+{
+  "name": "Printing Press Costing Calculator",
+  "description": "ক্যাশ মেমো ও অল-ইন-ওয়ান প্রেস কস্টিং ক্যালকুলেটর",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
