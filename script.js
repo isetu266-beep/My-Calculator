@@ -21,25 +21,32 @@ let masterRates = {
 };
 
 function loadMasterRates() {
-    const saved = localStorage.getItem('press_master_rates_v9') || localStorage.getItem('press_master_rates_v8');
+    masterRates = Object.assign({}, DEFAULT_MASTER_RATES);
+    const saved = localStorage.getItem('press_master_rates_v10') || localStorage.getItem('press_master_rates_v9') || localStorage.getItem('press_master_rates_v8');
     if (saved) {
-        masterRates = Object.assign(masterRates, JSON.parse(saved));
-        if (!masterRates.pl_hasi) {
-            masterRates.pl_hasi = masterRates.pl_gto || 130;
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed && typeof parsed === 'object') {
+                masterRates = Object.assign({}, DEFAULT_MASTER_RATES, parsed);
+            }
+        } catch(e) {
+            console.error('Failed to parse saved master rates:', e);
         }
+    }
+    if (!masterRates.pl_hasi) {
+        masterRates.pl_hasi = masterRates.pl_gto || 130;
     }
     for (let key in masterRates) {
         const el = document.getElementById('cfg_' + key);
         if (el) el.value = masterRates[key];
     }
 }
-
 function saveMasterRates() {
     for (let key in masterRates) {
         const el = document.getElementById('cfg_' + key);
         if (el) masterRates[key] = parseFloat(el.value) || 0;
     }
-    localStorage.setItem('press_master_rates_v9', JSON.stringify(masterRates));
+    localStorage.setItem('press_master_rates_v10', JSON.stringify(masterRates));
     alert('✅ সকল রেট সফলভাবে সেভ করা হয়েছে এবং সকল মডিউলে কার্যকর হয়েছে!');
     updatePaper1Options();
     updateNewsprintDropdown();
@@ -62,10 +69,10 @@ const DEFAULT_MASTER_RATES = {
     art20_80: 2100, art20_100: 2600, art20_120: 3100, art20_150: 3800,
     auto_bash: 2500, auto_china: 3200,
     pl_mini: 70, pl_hasi: 130, pl_gto: 130, pl_sdemi: 180, pl_demi: 220, pl_odemi: 270, pl_ddemi: 380,
-    pr_1c_mini: 100, pr_1c_hasi: 200, pr_1c_gto: 250, pr_1c_sdemi: 280, pr_1c_demi: 300, pr_1c_odemi: 350, pr_1c_ddemi: 450,
-    pr_2c_hasi: 400, pr_2c_gto: 500, pr_2c_sdemi: 550, pr_2c_demi: 600, pr_2c_odemi: 700, pr_2c_ddemi: 900,
-    pr_3c_hasi: 600, pr_3c_gto: 750, pr_3c_sdemi: 820, pr_3c_demi: 900, pr_3c_odemi: 1050, pr_3c_ddemi: 1350,
-    pr_4c_hasi: 800, pr_4c_gto: 1000, pr_4c_sdemi: 1100, pr_4c_demi: 1200, pr_4c_odemi: 1400, pr_4c_ddemi: 1800,
+    pr_1c_mini: 100, pr_1c_hasi: 200, pr_1c_gto: 250, pr_1c_sdemi: 280, pr_1c_demi: 300, pr_1c_odemi: 350, pr_1c_ddemi: 700,
+    pr_2c_hasi: 400, pr_2c_gto: 500, pr_2c_sdemi: 560, pr_2c_demi: 600, pr_2c_odemi: 700, pr_2c_ddemi: 1400,
+    pr_3c_hasi: 600, pr_3c_gto: 750, pr_3c_sdemi: 840, pr_3c_demi: 900, pr_3c_odemi: 1050, pr_3c_ddemi: 2100,
+    pr_4c_hasi: 800, pr_4c_gto: 1000, pr_4c_sdemi: 1120, pr_4c_demi: 1200, pr_4c_odemi: 1400, pr_4c_ddemi: 2800,
     bind_memo_5x75: 10, bind_memo_575x9: 12, bind_memo_6x115: 15, bind_memo_75x10: 18, bind_memo_9x115: 20, bind_memo_45x575: 8, bind_memo_375x5: 7,
     bind_pin_575x9: 7, bind_pin_5x75: 6, bind_pin_6x115: 9, bind_pin_75x10: 10, bind_pin_9x115: 12, bind_pin_45x575: 5, bind_pin_375x5: 4.5,
     bind_glue_575x9: 5, bind_glue_5x75: 4.5, bind_glue_6x115: 7, bind_glue_75x10: 8, bind_glue_9x115: 9, bind_glue_45x575: 3.5, bind_glue_375x5: 3,
@@ -97,6 +104,8 @@ function resetDefaultMasterRates() {
         const el = document.getElementById('cfg_' + key);
         if (el) el.value = masterRates[key];
     }
+    localStorage.removeItem('press_master_rates_v10');
+    localStorage.removeItem('press_master_rates_v9');
     localStorage.removeItem('press_master_rates_v8');
     localStorage.removeItem('press_master_rates_v7');
     alert('🔄 সফলভাবে সকল রেট ডিফল্ট মূল্যে রিসেট করা হয়েছে!');
@@ -429,6 +438,151 @@ function updatePrintFromPreset() {
     checkMachineCapacityWarningFor('memo');
 }
 
+// ------------------------------------------
+// পোস্টার কালার রেট প্রিভিউ ও বাটন সিঙ্ক
+// ------------------------------------------
+function syncPosterColorPrintDropdowns(machineId) {
+    const { normId, name, r1, r2, r3, r4 } = getMachinePrintRatesForSync(machineId);
+
+    const d1 = document.getElementById('pos_printRate1Color');
+    const d2 = document.getElementById('pos_printRate2Color');
+    const d3 = document.getElementById('pos_printRate3Color');
+    const d4 = document.getElementById('pos_printRate4Color');
+
+    const g2 = document.getElementById('pos_preset2ColorGroup') || (d2 ? d2.closest('.form-group') : null);
+    const g3 = document.getElementById('pos_preset3ColorGroup') || (d3 ? d3.closest('.form-group') : null);
+    const g4 = document.getElementById('pos_preset4ColorGroup') || (d4 ? d4.closest('.form-group') : null);
+
+    const setDisplay = (el, text) => {
+        if (!el) return;
+        if (el.tagName === 'INPUT') {
+            el.value = text;
+        } else {
+            el.textContent = text;
+        }
+    };
+
+    setDisplay(d1, `${name} ছাপা - ৳${r1}`);
+
+    if (normId === 'mini_half') {
+        if (g2) g2.style.display = 'none';
+        if (g3) g3.style.display = 'none';
+        if (g4) g4.style.display = 'none';
+    } else {
+        setDisplay(d2, `${name} ছাপা - ৳${r2}`);
+        setDisplay(d3, `${name} ছাপা - ৳${r3}`);
+        setDisplay(d4, `${name} ছাপা - ৳${r4}`);
+        if (g2) g2.style.display = '';
+        if (g3) g3.style.display = '';
+        if (g4) g4.style.display = '';
+    }
+    highlightActivePosterColorRateBox();
+}
+
+function highlightActivePosterColorRateBox() {
+    const selectedColor = parseInt(document.getElementById('pos_colorCount')?.value) || 4;
+    [1, 2, 3, 4].forEach(c => {
+        const el = document.getElementById(`pos_printRate${c}Color`);
+        if (el) {
+            if (c === selectedColor) {
+                el.style.backgroundColor = '#eff6ff';
+                el.style.borderColor = '#3b82f6';
+                el.style.color = '#1d4ed8';
+                el.style.borderWidth = '1.5px';
+            } else {
+                el.style.backgroundColor = '#f8fafc';
+                el.style.borderColor = '#cbd5e1';
+                el.style.color = '#334155';
+                el.style.borderWidth = '1px';
+            }
+        }
+    });
+}
+
+function onPosterColorPrintPresetClick(colorNum) {
+    if (!colorNum) return;
+    const colorElem = document.getElementById('pos_colorCount');
+    if (colorElem) {
+        colorElem.value = colorNum;
+    }
+    updatePosterPlateDetails();
+    checkMachineCapacityWarningFor('pos');
+    if (typeof calculatePosterCosting === 'function') calculatePosterCosting();
+}
+
+// ------------------------------------------
+// ক্যালেন্ডার কালার রেট প্রিভিউ ও বাটন সিঙ্ক
+// ------------------------------------------
+function syncCalendarColorPrintDropdowns(machineId) {
+    const { normId, name, r1, r2, r3, r4 } = getMachinePrintRatesForSync(machineId);
+
+    const d1 = document.getElementById('cal_printRate1Color');
+    const d2 = document.getElementById('cal_printRate2Color');
+    const d3 = document.getElementById('cal_printRate3Color');
+    const d4 = document.getElementById('cal_printRate4Color');
+
+    const g2 = document.getElementById('cal_preset2ColorGroup') || (d2 ? d2.closest('.form-group') : null);
+    const g3 = document.getElementById('cal_preset3ColorGroup') || (d3 ? d3.closest('.form-group') : null);
+    const g4 = document.getElementById('cal_preset4ColorGroup') || (d4 ? d4.closest('.form-group') : null);
+
+    const setDisplay = (el, text) => {
+        if (!el) return;
+        if (el.tagName === 'INPUT') {
+            el.value = text;
+        } else {
+            el.textContent = text;
+        }
+    };
+
+    setDisplay(d1, `${name} ছাপা - ৳${r1}`);
+
+    if (normId === 'mini_half') {
+        if (g2) g2.style.display = 'none';
+        if (g3) g3.style.display = 'none';
+        if (g4) g4.style.display = 'none';
+    } else {
+        setDisplay(d2, `${name} ছাপা - ৳${r2}`);
+        setDisplay(d3, `${name} ছাপা - ৳${r3}`);
+        setDisplay(d4, `${name} ছাপা - ৳${r4}`);
+        if (g2) g2.style.display = '';
+        if (g3) g3.style.display = '';
+        if (g4) g4.style.display = '';
+    }
+    highlightActiveCalendarColorRateBox();
+}
+
+function highlightActiveCalendarColorRateBox() {
+    const selectedColor = parseInt(document.getElementById('cal_colorCount')?.value) || 4;
+    [1, 2, 3, 4].forEach(c => {
+        const el = document.getElementById(`cal_printRate${c}Color`);
+        if (el) {
+            if (c === selectedColor) {
+                el.style.backgroundColor = '#eff6ff';
+                el.style.borderColor = '#3b82f6';
+                el.style.color = '#1d4ed8';
+                el.style.borderWidth = '1.5px';
+            } else {
+                el.style.backgroundColor = '#f8fafc';
+                el.style.borderColor = '#cbd5e1';
+                el.style.color = '#334155';
+                el.style.borderWidth = '1px';
+            }
+        }
+    });
+}
+
+function onCalendarColorPrintPresetClick(colorNum) {
+    if (!colorNum) return;
+    const colorElem = document.getElementById('cal_colorCount');
+    if (colorElem) {
+        colorElem.value = colorNum;
+    }
+    updateCalendarPlateDetails();
+    checkMachineCapacityWarningFor('cal');
+    if (typeof calculateCalendarCosting === 'function') calculateCalendarCosting();
+}
+
+
 function getPaperDatabase() {
     return {
         offset_2336: {
@@ -580,7 +734,7 @@ function updatePaper1Options(skipPresetSync = false) {
 
     if (mainTypeEl) mainTypeEl.value = isArt ? 'art' : 'offset';
     if (p1Label) p1Label.textContent = isArt ? 'আর্ট পেপার সাইজ' : 'অফসেট পেপার সাইজ';
-    if (p1Display) p1Display.value = is2030 ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডিমাই সাইজ)';
+    if (p1Display) p1Display.value = is2030 ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
 
     if (isArt) {
         if (dualBox) dualBox.style.display = 'none';
@@ -642,6 +796,8 @@ function detectMotherPaperCut(l, w) {
         isMatchCut(l, w, 6, 11.5) ||
         isMatchCut(l, w, 9, 11.5) ||
         isMatchCut(l, w, 11.5, 18) ||
+        isMatchCut(l, w, 18, 23) ||
+        isMatchCut(l, w, 23, 36) ||
         isMatchCut(l, w, 2.875, 4.5) ||
         isMatchCut(l, w, 5.75, 6) ||
         isMatchCut(l, w, 3.83, 4.5) ||
@@ -658,6 +814,8 @@ function detectMotherPaperCut(l, w) {
         isMatchCut(l, w, 5, 7.5) ||
         isMatchCut(l, w, 7.5, 10) ||
         isMatchCut(l, w, 10, 15) ||
+        isMatchCut(l, w, 15, 20) ||
+        isMatchCut(l, w, 20, 30) ||
         isMatchCut(l, w, 2.5, 3.75) ||
         isMatchCut(l, w, 5, 5) ||
         isMatchCut(l, w, 6.66, 10) ||
@@ -718,7 +876,7 @@ function setMotherPaperDisplayMode(matchedPaper) {
     if (matchedPaper === '2336') {
         if (p1Display) {
             p1Display.style.display = 'block';
-            p1Display.value = '23 × 36" (ডিমাই সাইজ)';
+            p1Display.value = '23 × 36" (ডাবল ডিমাই সাইজ)';
         }
         if (p1Select) p1Select.style.display = 'none';
         if (p1Warn) p1Warn.style.display = 'none';
@@ -770,7 +928,7 @@ function onCustomPaperCategorySelected() {
         if (p1Warn) {
             p1Warn.style.display = 'block';
             p1Warn.style.color = '#059669';
-            p1Warn.textContent = '✅ 23 × 36" (ডিমাই) সাইজ নির্বাচিত। নিচের ড্রপডাউন থেকে কাগজের GSM নির্বাচন করুন।';
+            p1Warn.textContent = '✅ 23 × 36" (ডাবল ডিমাই) সাইজ নির্বাচিত। নিচের ড্রপডাউন থেকে কাগজের GSM নির্বাচন করুন।';
         }
     } else if (val === '2030') {
         if (p1CatEl) p1CatEl.value = isArt ? 'art_2030' : 'offset_2030';
@@ -1064,7 +1222,6 @@ function handleCostingModeRouting() {
     const visitingCardSection = document.getElementById('visitingCardCostingSection');
     const calendarSection = document.getElementById('calendarCostingSection');
     const padSlipSection = document.getElementById('padSlipCostingSection');
-    const otherPrintingSection = document.getElementById('otherPrintingCostingSection');
 
     // সকল মডিউল প্রাথমিকভাবে লুকানো
     if (cashMemoSection) cashMemoSection.style.display = 'none';
@@ -1075,7 +1232,6 @@ function handleCostingModeRouting() {
     if (visitingCardSection) visitingCardSection.style.display = 'none';
     if (calendarSection) calendarSection.style.display = 'none';
     if (padSlipSection) padSlipSection.style.display = 'none';
-    if (otherPrintingSection) otherPrintingSection.style.display = 'none';
 
     // শুধুমাত্র নির্বাচিত মডিউল দৃশ্যমান করা
     if (mode === 'memo_dual' && cashMemoSection) {
@@ -1094,8 +1250,8 @@ function handleCostingModeRouting() {
         calendarSection.style.display = 'block';
     } else if (mode === 'pad_slip' && padSlipSection) {
         padSlipSection.style.display = 'block';
-    } else if (mode === 'other_printing' && otherPrintingSection) {
-        otherPrintingSection.style.display = 'block';
+        updatePadSlipPaperOptions();
+        applyPadSlipPresetSize();
     }
 }
 
@@ -1108,13 +1264,16 @@ function initAllCostingModules() {
     updateVisitingCardBoardRate();
     updateCalendarPaperOptions();
     updatePadSlipPaperOptions();
+    applyPadSlipPresetSize();
     updateAutoCarbonPaperOptions();
 
     // সকল মডিউলের জন্য মেশিন ক্যাপাসিটি ও রেট ইনিশিয়ালাইজ করা
-    const allModules = ['memo', 'auto', 'sp', 'pos', 'stk', 'vc', 'cal', 'pad', 'oth'];
+    const allModules = ['memo', 'auto', 'sp', 'pos', 'stk', 'vc', 'cal', 'pad'];
     allModules.forEach(prefix => {
         checkMachineCapacityWarningFor(prefix);
     });
+    syncPosterColorPrintDropdowns(document.getElementById('pos_plateType')?.value || 'demi');
+    syncCalendarColorPrintDropdowns(document.getElementById('cal_plateType')?.value || 'demi');
 }
 
 // ==========================================
@@ -1549,6 +1708,15 @@ function getOptimalMachineId(prefix) {
     // একাধিক কালার কাজের জন্য মিনি মেশিন সম্পূর্ণ নিষিদ্ধ (শুধুমাত্র ১-কালার সম্ভব)
     const allowMini = (colors <= 1);
 
+    // 🎯 প্যাড / স্লিপ মডিউলের জন্য স্বয়ংক্রিয় সর্বনিম্ন খরচের মেশিন ক্যালকুলেশন
+    if (prefix === 'pad') {
+        const evaluated = evaluateMachinesFor('pad');
+        if (evaluated && evaluated.length > 0) {
+            return evaluated[0].machine.id;
+        }
+        return 'demi';
+    }
+
     // 1. 5.75 × 9 ইঞ্চি (1/8 ডিমাই ক্যাশ মেমো)
     if (l >= 5.2 && l <= 6.0 && w >= 8.2 && w <= 9.3) {
         if (allowMini && totalQty <= 3000) return 'mini_half'; // 2 আপে 500-1,500 শিট (100৳ প্রিন্ট + 70৳ প্লেট)
@@ -1740,7 +1908,7 @@ function getMachineCrossoverAnalysis(prefix) {
 
 function checkMachineCapacityWarningFor(prefix) {
     const config = getModuleMachineConfig(prefix);
-    const { cutL, cutW, currentMachine, machineId, colors, multiplier, totalQty, warningBox, plateCostInput, printCostInput } = config;
+    const { cutL, cutW, currentMachine, machineId, colors, multiplier, totalQty, warningBox, plateCostInput, printCostInput, resultBox } = config;
 
     // ❌❌❌ একাধিক কালার (২/৩/৪ কালার) কাজের জন্য মিনি মেশিন নির্বাচন করলে সতর্কবার্তা
     if (machineId === 'mini_half' && colors >= 2) {
@@ -1842,6 +2010,10 @@ function checkMachineCapacityWarningFor(prefix) {
 
     if (printCostInput) printCostInput.value = dynamicPrintCost;
 
+    if (prefix === 'pos') {
+        syncPosterColorPrintDropdowns(machineId);
+    }
+
     renderMachineRecommendationFor(prefix, totalPlateCost + dynamicPrintCost, true);
 
     // যদি ফলাফল বক্স আগে থেকেই ওপেন থাকে, তবে লাইভ রিক্যালকুলেট করো
@@ -1854,7 +2026,6 @@ function checkMachineCapacityWarningFor(prefix) {
         else if (prefix === 'cal' && typeof calculateCalendarCosting === 'function') calculateCalendarCosting();
         else if (prefix === 'pad' && typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();
         else if (prefix === 'auto' && typeof calculateAutoCarbonCosting === 'function') calculateAutoCarbonCosting();
-        else if (prefix === 'oth' && typeof calculateOtherPrintingCosting === 'function') calculateOtherPrintingCosting();
     }
 }
 
@@ -2111,6 +2282,36 @@ function selectMachineFor(prefix, machineId) {
             if (config.plateCostInput) {
                 config.plateCostInput.value = singlePlateRate * colors;
             }
+        } else if (prefix === 'pos') {
+            syncPosterColorPrintDropdowns(machineId);
+            const colors = parseInt(document.getElementById('pos_colorCount')?.value) || 4;
+            const singlePlateRate = getPlateRateForMachine(machineId);
+            if (config.plateCostInput) {
+                config.plateCostInput.value = singlePlateRate * colors;
+            }
+        } else if (prefix === 'cal') {
+            syncCalendarColorPrintDropdowns(machineId);
+            const colors = parseInt(document.getElementById('cal_colorCount')?.value) || 4;
+            const leaves = parseInt(document.getElementById('cal_leavesCount')?.value) || 1;
+            const singlePlateRate = getPlateRateForMachine(machineId);
+            if (config.plateCostInput) {
+                config.plateCostInput.value = singlePlateRate * colors * leaves;
+            }
+        } else if (prefix === 'pad') {
+            const colors = parseInt(document.getElementById('pad_colorCount')?.value) || 1;
+            const singlePlateRate = getPlateRateForMachine(machineId);
+            if (config.plateCostInput) {
+                config.plateCostInput.value = singlePlateRate * colors;
+            }
+            const machine = ALL_PRINT_MACHINES.find(m => m.id === machineId);
+            if (machine && config.printCostInput) {
+                const ups = getMachineUpsForSize(machine, config.cutL, config.cutW);
+                if (ups > 0) {
+                    const printSheets = Math.ceil(config.totalQty / ups);
+                    const dynamicResult = calculateDynamicPrintCost(machineId, colors, printSheets, 1);
+                    config.printCostInput.value = dynamicResult.totalPrintCost;
+                }
+            }
         } else {
             const singlePlateRate = getPlateRateForMachine(machineId);
             if (config.plateCostInput) {
@@ -2167,20 +2368,88 @@ function updateCalendarPlateDetails(skipAutoDetect = false) {
     checkMachineCapacityWarningFor('cal');
 }
 
-function updateOtherPrintingPlateDetails(skipAutoDetect = false) {
-    if (!skipAutoDetect && typeof autoDetectOptimalMachine === 'function') {
-        autoDetectOptimalMachine('oth');
-    }
-    checkMachineCapacityWarningFor('oth');
-}
-
 // ==========================================
 // 2. সিঙ্গেল পেপার ছাপার হিসাব (Single Paper Costing)
 // ==========================================
-function updateSinglePaperOptions() {
-    const cat = document.getElementById('sp_paperCategory').value;
+function onSinglePaperMainTypeChange() {
+    const mainType = document.getElementById('sp_paperMainType')?.value || 'offset';
+    const hiddenCat = document.getElementById('sp_paperCategory');
+    const currentCat = hiddenCat ? hiddenCat.value : 'offset_2336';
+    const is2030 = (currentCat === 'offset_2030' || currentCat === 'art_2030');
+
+    if (mainType === 'art') {
+        if (hiddenCat) hiddenCat.value = is2030 ? 'art_2030' : 'art_2336';
+    } else {
+        if (hiddenCat) hiddenCat.value = is2030 ? 'offset_2030' : 'offset_2336';
+    }
+    updateSinglePaperOptions(true);
+    if (typeof calculateSinglePaperCosting === 'function') calculateSinglePaperCosting();
+}
+
+function onSinglePaperCustomCategorySelected() {
+    const select = document.getElementById('sp_paperCategorySelect');
+    const hidden = document.getElementById('sp_paperCategory');
+    const mainType = document.getElementById('sp_paperMainType')?.value || 'offset';
+    if (select && hidden) {
+        hidden.value = `${mainType}_${select.value}`;
+        updateSinglePaperOptions(true);
+        if (typeof calculateSinglePaperCosting === 'function') calculateSinglePaperCosting();
+    }
+}
+
+function updateSinglePaperOptions(skipPresetSync = false) {
+    const catEl = document.getElementById('sp_paperCategory');
+    let cat = catEl ? catEl.value : 'offset_2336';
+    const isArt = cat.startsWith('art_');
+    const is2030 = (cat === 'offset_2030' || cat === 'art_2030');
+
+    // UI ডিসপ্লে ও লেবেল সিঙ্ক রাখা
+    const mainTypeEl = document.getElementById('sp_paperMainType');
+    const pLabel = document.getElementById('sp_paperCategoryLabel');
+    const pDisplay = document.getElementById('sp_paperCategoryDisplay');
+    const pSelect = document.getElementById('sp_paperCategorySelect');
+    const pWarning = document.getElementById('sp_paperCategoryWarning');
+
+    if (mainTypeEl) mainTypeEl.value = isArt ? 'art' : 'offset';
+    if (pLabel) pLabel.textContent = isArt ? 'আর্ট পেপার সাইজ' : 'অফসেট পেপার সাইজ';
+    if (pDisplay) pDisplay.value = is2030 ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
+
+    // মাদার পেপার সাইজ সিঙ্ক
+    if (!skipPresetSync) {
+        const cutL = parseFloat(document.getElementById('sp_cutLength')?.value) || 5.75;
+        const cutW = parseFloat(document.getElementById('sp_cutWidth')?.value) || 9;
+        const matchedMother = detectMotherPaperCut(cutL, cutW);
+        if (matchedMother) {
+            cat = `${isArt ? 'art' : 'offset'}_${matchedMother}`;
+            if (catEl) catEl.value = cat;
+            if (pDisplay) {
+                pDisplay.style.display = 'block';
+                pDisplay.value = matchedMother === '2030' ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
+            }
+            if (pSelect) pSelect.style.display = 'none';
+            if (pWarning) pWarning.style.display = 'none';
+        } else {
+            // কাস্টম বা নন-স্ট্যান্ডার্ড সাইজ
+            if (pDisplay) pDisplay.style.display = 'none';
+            if (pSelect) {
+                pSelect.style.display = 'block';
+                pSelect.value = is2030 ? '2030' : '2336';
+            }
+            if (pWarning) {
+                pWarning.style.display = 'block';
+                pWarning.style.color = '#d97706';
+                pWarning.textContent = '⚠️ কাস্টম সাইজের জন্য উপযুক্ত মাদার পেপার নির্বাচন করুন';
+            }
+        }
+    }
+
     const select = document.getElementById('sp_paperGsmRate');
     if (!select) return;
+    let prevGsmText = "";
+    if (select.selectedIndex >= 0 && select.options[select.selectedIndex]) {
+        prevGsmText = select.options[select.selectedIndex].textContent.split(' ')[0];
+    }
+    const prevGsmVal = select.value;
     select.innerHTML = "";
 
     const db = getPaperDatabase();
@@ -2191,6 +2460,25 @@ function updateSinglePaperOptions() {
             opt.textContent = `${item.gsm} (৳${item.ream}/রিম - ৳${item.sheet.toFixed(2)}/পাতা)`;
             select.appendChild(opt);
         });
+    }
+
+    let matched = false;
+    if (prevGsmText) {
+        for (let opt of select.options) {
+            if (opt.textContent.startsWith(prevGsmText)) {
+                select.value = opt.value;
+                matched = true;
+                break;
+            }
+        }
+    }
+    if (!matched && prevGsmVal) {
+        for (let opt of select.options) {
+            if (Math.abs(parseFloat(opt.value) - parseFloat(prevGsmVal)) < 0.001) {
+                select.value = opt.value;
+                break;
+            }
+        }
     }
 }
 
@@ -2204,7 +2492,10 @@ function applySinglePaperPresetSize() {
         l.value = parts[0];
         w.value = parts[1];
     }
+    updateSinglePaperOptions();
+    updateSinglePaperPlateDetails();
     checkMachineCapacityWarningFor('sp');
+    if (typeof calculateSinglePaperCosting === 'function') calculateSinglePaperCosting();
 }
 
 function autoSelectSinglePaperPresetSize() {
@@ -2221,7 +2512,10 @@ function autoSelectSinglePaperPresetSize() {
         }
     }
     if (!match) preset.value = 'custom';
+    updateSinglePaperOptions();
+    updateSinglePaperPlateDetails();
     checkMachineCapacityWarningFor('sp');
+    if (typeof calculateSinglePaperCosting === 'function') calculateSinglePaperCosting();
 }
 
 function calculateSinglePaperCosting() {
@@ -2310,12 +2604,82 @@ function calculateSinglePaperCosting() {
 // ==========================================
 // 3. পোস্টার / হ্যান্ডবিল ছাপার হিসাব (Poster Costing)
 // ==========================================
-function updatePosterPaperOptions() {
-    const cat = document.getElementById('pos_paperCategory').value;
+function onPosterPaperMainTypeChange() {
+    const mainType = document.getElementById('pos_paperMainType')?.value || 'art';
+    const hiddenCat = document.getElementById('pos_paperCategory');
+    const currentCat = hiddenCat ? hiddenCat.value : 'art_2336';
+    const is2030 = (currentCat === 'offset_2030' || currentCat === 'art_2030');
+
+    if (mainType === 'art') {
+        if (hiddenCat) hiddenCat.value = is2030 ? 'art_2030' : 'art_2336';
+    } else {
+        if (hiddenCat) hiddenCat.value = is2030 ? 'offset_2030' : 'offset_2336';
+    }
+    updatePosterPaperOptions(true);
+    if (typeof calculatePosterCosting === 'function') calculatePosterCosting();
+}
+
+function onPosterCustomCategorySelected() {
+    const select = document.getElementById('pos_paperCategorySelect');
+    const hidden = document.getElementById('pos_paperCategory');
+    const mainType = document.getElementById('pos_paperMainType')?.value || 'art';
+    if (select && hidden) {
+        hidden.value = `${mainType}_${select.value}`;
+        updatePosterPaperOptions(true);
+        if (typeof calculatePosterCosting === 'function') calculatePosterCosting();
+    }
+}
+
+function updatePosterPaperOptions(skipPresetSync = false) {
+    const catEl = document.getElementById('pos_paperCategory');
+    let cat = catEl ? catEl.value : 'art_2336';
+    const isArt = cat.startsWith('art_');
+    const is2030 = (cat === 'offset_2030' || cat === 'art_2030');
+
+    // UI ডিসপ্লে ও লেবেল সিঙ্ক রাখা
+    const mainTypeEl = document.getElementById('pos_paperMainType');
+    const pLabel = document.getElementById('pos_paperCategoryLabel');
+    const pDisplay = document.getElementById('pos_paperCategoryDisplay');
+    const pSelect = document.getElementById('pos_paperCategorySelect');
+    const pWarning = document.getElementById('pos_paperCategoryWarning');
+
+    if (mainTypeEl) mainTypeEl.value = isArt ? 'art' : 'offset';
+    if (pLabel) pLabel.textContent = isArt ? 'আর্ট পেপার সাইজ' : 'অফসেট পেপার সাইজ';
+    if (pDisplay) pDisplay.value = is2030 ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
+
+    // মাদার পেপার সাইজ সিঙ্ক
+    if (!skipPresetSync) {
+        const cutL = parseFloat(document.getElementById('pos_cutLength')?.value) || 11.5;
+        const cutW = parseFloat(document.getElementById('pos_cutWidth')?.value) || 18;
+        const matchedMother = detectMotherPaperCut(cutL, cutW);
+        if (matchedMother) {
+            cat = `${isArt ? 'art' : 'offset'}_${matchedMother}`;
+            if (catEl) catEl.value = cat;
+            if (pDisplay) {
+                pDisplay.style.display = 'block';
+                pDisplay.value = matchedMother === '2030' ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
+            }
+            if (pSelect) pSelect.style.display = 'none';
+            if (pWarning) pWarning.style.display = 'none';
+        } else {
+            // কাস্টম বা নন-স্ট্যান্ডার্ড সাইজ
+            if (pDisplay) pDisplay.style.display = 'none';
+            if (pSelect) {
+                pSelect.style.display = 'block';
+                pSelect.value = is2030 ? '2030' : '2336';
+            }
+            if (pWarning) {
+                pWarning.style.display = 'block';
+                pWarning.style.color = '#d97706';
+                pWarning.textContent = '⚠️ কাস্টম সাইজের জন্য উপযুক্ত মাদার পেপার নির্বাচন করুন';
+            }
+        }
+    }
+
     const select = document.getElementById('pos_paperGsmRate');
     if (!select) return;
+    const prevGsmVal = select.value;
     select.innerHTML = "";
-
     const db = getPaperDatabase();
     if (db[cat] && db[cat].items) {
         db[cat].items.forEach(item => {
@@ -2324,6 +2688,14 @@ function updatePosterPaperOptions() {
             opt.textContent = `${item.gsm} (৳${item.ream}/রিম - ৳${item.sheet.toFixed(2)}/পাতা)`;
             select.appendChild(opt);
         });
+    }
+    if (prevGsmVal) {
+        for (let opt of select.options) {
+            if (Math.abs(parseFloat(opt.value) - parseFloat(prevGsmVal)) < 0.001) {
+                select.value = opt.value;
+                break;
+            }
+        }
     }
 }
 
@@ -2337,8 +2709,11 @@ function applyPosterPresetSize() {
         l.value = parts[0];
         w.value = parts[1];
     }
+    updatePosterPaperOptions();
+    updatePosterLaminationCost();
     updatePosterPlateDetails();
     checkMachineCapacityWarningFor('pos');
+    if (typeof calculatePosterCosting === 'function') calculatePosterCosting();
 }
 
 function autoSelectPosterPresetSize() {
@@ -2355,17 +2730,21 @@ function autoSelectPosterPresetSize() {
         }
     }
     if (!match) preset.value = 'custom';
+    updatePosterPaperOptions();
+    updatePosterLaminationCost();
     updatePosterPlateDetails();
     checkMachineCapacityWarningFor('pos');
+    if (typeof calculatePosterCosting === 'function') calculatePosterCosting();
 }
 
 function updatePosterLaminationCost() {
-    const type = document.getElementById('pos_laminationType').value;
-    const qty = parseInt(document.getElementById('pos_totalQty').value) || 1000;
-    const l = parseFloat(document.getElementById('pos_cutLength').value) || 11.5;
-    const w = parseFloat(document.getElementById('pos_cutWidth').value) || 18;
+    const type = document.getElementById('pos_laminationType')?.value || 'none';
+    const qty = parseInt(document.getElementById('pos_totalQty')?.value) || 1000;
+    const l = parseFloat(document.getElementById('pos_cutLength')?.value) || 11.5;
+    const w = parseFloat(document.getElementById('pos_cutWidth')?.value) || 18;
     const lamInput = document.getElementById('pos_laminationCost');
 
+    if (!lamInput) return;
     if (type === 'none') {
         lamInput.value = 0;
     } else {
@@ -2376,12 +2755,12 @@ function updatePosterLaminationCost() {
 }
 
 function calculatePosterCosting() {
-    const cat = document.getElementById('pos_paperCategory').value;
-    const paperPricePerSheet = parseFloat(document.getElementById('pos_paperGsmRate').value) || 0;
-    const cutL = parseFloat(document.getElementById('pos_cutLength').value) || 1;
-    const cutW = parseFloat(document.getElementById('pos_cutWidth').value) || 1;
-    const totalQty = parseInt(document.getElementById('pos_totalQty').value) || 0;
-    const pType = document.getElementById('pos_plateType').value;
+    const cat = document.getElementById('pos_paperCategory')?.value || 'art_2336';
+    const paperPricePerSheet = parseFloat(document.getElementById('pos_paperGsmRate')?.value) || 0;
+    const cutL = parseFloat(document.getElementById('pos_cutLength')?.value) || 1;
+    const cutW = parseFloat(document.getElementById('pos_cutWidth')?.value) || 1;
+    const totalQty = parseInt(document.getElementById('pos_totalQty')?.value) || 0;
+    const pType = document.getElementById('pos_plateType')?.value || 'demi';
 
     const currentMachine = ALL_PRINT_MACHINES.find(m => m.id === pType) || ALL_PRINT_MACHINES[4];
     const currentUps = getMachineUpsForSize(currentMachine, cutL, cutW);
@@ -2434,28 +2813,28 @@ function calculatePosterCosting() {
     const totalReams = (totalSheets / 500).toFixed(2);
     const paperCost = totalSheets * paperPricePerSheet;
 
-    const plateCost = parseFloat(document.getElementById('pos_plateCost').value) || 0;
-    const printCost = parseFloat(document.getElementById('pos_printCost').value) || 0;
-    const laminationCost = parseFloat(document.getElementById('pos_laminationCost').value) || 0;
-    const otherCost = parseFloat(document.getElementById('pos_otherCost').value) || 0;
+    const plateCost = parseFloat(document.getElementById('pos_plateCost')?.value) || 0;
+    const printCost = parseFloat(document.getElementById('pos_printCost')?.value) || 0;
+    const laminationCost = parseFloat(document.getElementById('pos_laminationCost')?.value) || 0;
+    const otherCost = parseFloat(document.getElementById('pos_otherCost')?.value) || 0;
 
     const grandTotal = paperCost + plateCost + printCost + laminationCost + otherCost;
     const perUnitCost = totalQty > 0 ? (grandTotal / totalQty) : 0;
 
-    document.getElementById('pos_resOutPerSheet').textContent = `${outPerSheet} পিস`;
-    document.getElementById('pos_resTotalSheets').textContent = `${totalSheets} শিট (${totalReams} রিম)`;
-    document.getElementById('pos_resPaperCost').textContent = `৳ ${paperCost.toFixed(2)}`;
-    document.getElementById('pos_resPlateCost').textContent = `৳ ${plateCost.toFixed(2)}`;
-    document.getElementById('pos_resPrintCost').textContent = `৳ ${printCost.toFixed(2)}`;
-    document.getElementById('pos_resLaminationCost').textContent = `৳ ${laminationCost.toFixed(2)}`;
-    document.getElementById('pos_resOtherCost').textContent = `৳ ${otherCost.toFixed(2)}`;
-    document.getElementById('pos_resGrandTotal').textContent = `৳ ${grandTotal.toFixed(2)}`;
-    document.getElementById('pos_resPerUnitCost').textContent = `৳ ${perUnitCost.toFixed(2)}`;
+    if (document.getElementById('pos_resOutPerSheet')) document.getElementById('pos_resOutPerSheet').textContent = `${outPerSheet} পিস`;
+    if (document.getElementById('pos_resTotalSheets')) document.getElementById('pos_resTotalSheets').textContent = `${totalSheets} শিট (${totalReams} রিম)`;
+    if (document.getElementById('pos_resPaperCost')) document.getElementById('pos_resPaperCost').textContent = `৳ ${paperCost.toFixed(2)}`;
+    if (document.getElementById('pos_resPlateCost')) document.getElementById('pos_resPlateCost').textContent = `৳ ${plateCost.toFixed(2)}`;
+    if (document.getElementById('pos_resPrintCost')) document.getElementById('pos_resPrintCost').textContent = `৳ ${printCost.toFixed(2)}`;
+    if (document.getElementById('pos_resLaminationCost')) document.getElementById('pos_resLaminationCost').textContent = `৳ ${laminationCost.toFixed(2)}`;
+    if (document.getElementById('pos_resOtherCost')) document.getElementById('pos_resOtherCost').textContent = `৳ ${otherCost.toFixed(2)}`;
+    if (document.getElementById('pos_resGrandTotal')) document.getElementById('pos_resGrandTotal').textContent = `৳ ${grandTotal.toFixed(2)}`;
+    if (document.getElementById('pos_resPerUnitCost')) document.getElementById('pos_resPerUnitCost').textContent = `৳ ${perUnitCost.toFixed(2)}`;
 
     // 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট
     renderDetailedMachineNote('pos', { itemLabel: 'পিস পোস্টার' });
 
-    document.getElementById('pos_resultBox').style.display = 'block';
+    if (resBox) resBox.style.display = 'block';
 }
 
 // ==========================================
@@ -2785,12 +3164,21 @@ function calculateVisitingCardCosting() {
 // ==========================================
 // 6. ক্যালেন্ডার ছাপার হিসাব (Calendar Costing)
 // ==========================================
+function onCalendarCustomCategorySelected() {
+    const select = document.getElementById('cal_paperCategorySelect');
+    const hidden = document.getElementById('cal_paperCategory');
+    if (select && hidden) {
+        hidden.value = select.value;
+        updateCalendarPaperOptions(true);
+        if (typeof calculateCalendarCosting === 'function') calculateCalendarCosting();
+    }
+}
+
 function updateCalendarLeaves() {
     const type = document.getElementById('cal_calendarType')?.value || '1_wall';
     const leavesInput = document.getElementById('cal_leavesCount');
     const bindingSelect = document.getElementById('cal_bindingType');
     const presetSize = document.getElementById('cal_presetSize');
-    const paperCat = document.getElementById('cal_paperCategory');
 
     if (!leavesInput) return;
 
@@ -2841,20 +3229,77 @@ function updateCalendarLeaves() {
             presetSize.value = '8.5x5.5';
             applyCalendarPresetSize();
         }
-        if (paperCat && (paperCat.value === 'art_2336' || paperCat.value === 'offset_2336')) {
-            paperCat.value = 'card_art_2228';
-            updateCalendarPaperOptions();
-        }
     }
+    updateCalendarPaperOptions();
     updateCalendarBindingRate();
     updateCalendarPlateDetails();
     checkMachineCapacityWarningFor('cal');
 }
 
-function updateCalendarPaperOptions() {
-    const cat = document.getElementById('cal_paperCategory')?.value || 'art_2336';
+function updateCalendarPaperOptions(skipPresetSync = false) {
+    const catEl = document.getElementById('cal_paperCategory');
+    let cat = catEl ? catEl.value : 'art_2336';
+    const type = document.getElementById('cal_calendarType')?.value || '1_wall';
+    const isDesk = type.startsWith('desk');
+
+    const pLabel = document.getElementById('cal_paperCategoryLabel');
+    const pDisplay = document.getElementById('cal_paperCategoryDisplay');
+    const pSelect = document.getElementById('cal_paperCategorySelect');
+    const pWarning = document.getElementById('cal_paperCategoryWarning');
+
+    if (!skipPresetSync) {
+        if (isDesk) {
+            cat = 'card_art_2228';
+            if (catEl) catEl.value = cat;
+            if (pLabel) pLabel.textContent = 'আর্ট কার্ড / সুইডিশ বোর্ড সাইজ';
+            if (pDisplay) {
+                pDisplay.style.display = 'block';
+                pDisplay.value = '22 × 28" (আর্ট কার্ড / বোর্ড সাইজ)';
+            }
+            if (pSelect) pSelect.style.display = 'none';
+            if (pWarning) pWarning.style.display = 'none';
+        } else {
+            const cutL = parseFloat(document.getElementById('cal_cutLength')?.value) || 18;
+            const cutW = parseFloat(document.getElementById('cal_cutWidth')?.value) || 23;
+            const matchedMother = detectMotherPaperCut(cutL, cutW);
+            if (pLabel) pLabel.textContent = 'আর্ট পেপারের সাইজ (মাদার সাইজ)';
+
+            if (matchedMother) {
+                cat = `art_${matchedMother}`;
+                if (catEl) catEl.value = cat;
+                if (pDisplay) {
+                    pDisplay.style.display = 'block';
+                    pDisplay.value = matchedMother === '2030' ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
+                }
+                if (pSelect) pSelect.style.display = 'none';
+                if (pWarning) pWarning.style.display = 'none';
+            } else {
+                // কাস্টম বা নন-স্ট্যান্ডার্ড সাইজ
+                if (pDisplay) pDisplay.style.display = 'none';
+                if (pSelect) {
+                    pSelect.style.display = 'block';
+                    pSelect.value = (cat === 'art_2030' || cat === 'card_art_2228') ? cat : 'art_2336';
+                }
+                if (pWarning) {
+                    pWarning.style.display = 'block';
+                    pWarning.style.color = '#d97706';
+                    pWarning.textContent = '⚠️ কাস্টম সাইজের জন্য উপযুক্ত মাদার পেপার নির্বাচন করুন';
+                }
+            }
+        }
+    } else {
+        if (cat === 'card_art_2228') {
+            if (pLabel) pLabel.textContent = 'আর্ট কার্ড / সুইডিশ বোর্ড সাইজ';
+            if (pDisplay) pDisplay.value = '22 × 28" (আর্ট কার্ড / বোর্ড সাইজ)';
+        } else {
+            if (pLabel) pLabel.textContent = 'আর্ট পেপারের সাইজ (মাদার সাইজ)';
+            if (pDisplay) pDisplay.value = cat === 'art_2030' ? '20 × 30" (ক্রাউন সাইজ)' : '23 × 36" (ডাবল ডিমাই সাইজ)';
+        }
+    }
+
     const select = document.getElementById('cal_paperGsmRate');
     if (!select) return;
+    const prevGsmVal = select.value;
     select.innerHTML = "";
 
     const db = getPaperDatabase();
@@ -2870,6 +3315,14 @@ function updateCalendarPaperOptions() {
             select.appendChild(opt);
         });
     }
+    if (prevGsmVal) {
+        for (let opt of select.options) {
+            if (Math.abs(parseFloat(opt.value) - parseFloat(prevGsmVal)) < 0.001) {
+                select.value = opt.value;
+                break;
+            }
+        }
+    }
 }
 
 function applyCalendarPresetSize() {
@@ -2882,8 +3335,10 @@ function applyCalendarPresetSize() {
         l.value = parts[0];
         w.value = parts[1];
     }
+    updateCalendarPaperOptions();
     updateCalendarPlateDetails();
     checkMachineCapacityWarningFor('cal');
+    if (typeof calculateCalendarCosting === 'function') calculateCalendarCosting();
 }
 
 function autoSelectCalendarPresetSize() {
@@ -2901,8 +3356,10 @@ function autoSelectCalendarPresetSize() {
         }
     }
     if (!match) preset.value = 'custom';
+    updateCalendarPaperOptions();
     updateCalendarPlateDetails();
     checkMachineCapacityWarningFor('cal');
+    if (typeof calculateCalendarCosting === 'function') calculateCalendarCosting();
 }
 
 function updateCalendarBindingRate() {
@@ -2915,6 +3372,11 @@ function updateCalendarBindingRate() {
         if (leaves <= 1) rateInput.value = 6;
         else if (leaves <= 3) rateInput.value = 8;
         else rateInput.value = 12;
+    } else if (type === 'fiber_binding') {
+        const leaves = parseInt(document.getElementById('cal_leavesCount')?.value) || 1;
+        if (leaves <= 1) rateInput.value = 8;
+        else if (leaves <= 3) rateInput.value = 10;
+        else rateInput.value = 14;
     } else if (type === 'spiral_wall') {
         const leaves = parseInt(document.getElementById('cal_leavesCount')?.value) || 1;
         if (leaves <= 3) rateInput.value = 16;
@@ -2933,6 +3395,7 @@ function updateCalendarPlateDetails(skipAutoDetect = false) {
     if (!skipAutoDetect && typeof autoDetectOptimalMachine === 'function') {
         autoDetectOptimalMachine('cal');
     }
+    syncCalendarColorPrintDropdowns(document.getElementById('cal_plateType')?.value || 'demi');
     checkMachineCapacityWarningFor('cal');
 }
 
@@ -3025,14 +3488,57 @@ function calculateCalendarCosting() {
 // ==========================================
 // 7. প্যাড / স্লিপ ছাপার হিসাব (Pad / Slip Costing)
 // ==========================================
-function updatePadSlipPaperOptions() {
-    const cat = document.getElementById('pad_paperCategory')?.value || 'offset_2336';
+function autoSelectMotherPaperForPad(l, w) {
+    if (!l || !w || l <= 0 || w <= 0) return;
+    
+    // ক্রাউন সাইজ (20×30") ডিটেকশন
+    const isCrown = (
+        (Math.abs(l - 3.75) < 0.25 && Math.abs(w - 5) < 0.25) ||
+        (Math.abs(l - 5) < 0.25 && Math.abs(w - 3.75) < 0.25) ||
+        (Math.abs(l - 5) < 0.25 && Math.abs(w - 7.5) < 0.25) ||
+        (Math.abs(l - 7.5) < 0.25 && Math.abs(w - 5) < 0.25) ||
+        (Math.abs(l - 7.5) < 0.25 && Math.abs(w - 10) < 0.25) ||
+        (Math.abs(l - 10) < 0.25 && Math.abs(w - 7.5) < 0.25) ||
+        (Math.abs(l - 3.76) < 0.25 && Math.abs(w - 10) < 0.25) ||
+        (Math.abs(l - 10) < 0.25 && Math.abs(w - 3.76) < 0.25) ||
+        (typeof detectMotherPaperCut === 'function' && detectMotherPaperCut(l, w) === '2030')
+    );
+    
+    const targetCat = isCrown ? 'offset_2030' : 'offset_2336';
+    const catSelect = document.getElementById('pad_paperCategory');
+    const badge = document.getElementById('pad_motherPaperAutoBadge');
+    
+    if (catSelect) {
+        catSelect.value = targetCat;
+    }
+    
+    // কাট সাইজ পরিবর্তন বা সিলেক্ট করার সাথে সাথে কাগজের কোয়ালিটি / GSM ও দাম ডায়নামিকালি আপডেট করা
+    updatePadSlipPaperOptions(true);
+    
+    if (badge) {
+        badge.innerHTML = isCrown ? 
+            '💡 সাইজ অনুযায়ী মাদার পেপার অটো সিলেক্টেড: <strong>ক্রাউন (20×30")</strong>' : 
+            '💡 সাইজ অনুযায়ী মাদার পেপার অটো সিলেক্টেড: <strong>ডাবল ডিমাই (23×36")</strong>';
+    }
+}
+
+function updatePadSlipPaperOptions(skipDetect = false) {
+    const catSelect = document.getElementById('pad_paperCategory');
+    const cat = catSelect?.value || 'offset_2336';
     const select = document.getElementById('pad_paperGsmRate');
+    const badge = document.getElementById('pad_motherPaperAutoBadge');
+    
     if (select) {
+        // পূর্বে ইউজার যে GSM পছন্দ করেছিলেন (যেমন 70 GSM বা 80 GSM) তা ট্র্যাক রাখা
+        const prevText = select.options[select.selectedIndex]?.textContent || '';
+        const prevGsmMatch = prevText.match(/(\d+)\s*GSM/i);
+        const prevGsm = prevGsmMatch ? prevGsmMatch[1] : '';
+
         select.innerHTML = "";
         const db = getPaperDatabase();
-        if (db[cat]) {
-            db[cat].items.forEach(item => {
+        if (db[cat] && db[cat].items) {
+            let matchedIndex = -1;
+            db[cat].items.forEach((item, idx) => {
                 const opt = document.createElement('option');
                 opt.value = item.sheet;
                 if (item.type === 'sheet') {
@@ -3041,35 +3547,26 @@ function updatePadSlipPaperOptions() {
                     opt.textContent = `${item.gsm} (৳${item.ream}/রিম - ৳${item.sheet.toFixed(2)}/পাতা)`;
                 }
                 select.appendChild(opt);
+
+                if (prevGsm && item.gsm.includes(prevGsm)) {
+                    matchedIndex = idx;
+                }
             });
+
+            if (matchedIndex >= 0) {
+                select.selectedIndex = matchedIndex;
+            } else if (select.options.length > 1) {
+                // ডিফল্ট হিসেবে 70 GSM (ইনডেক্স 1) সিলেক্ট রাখা
+                select.selectedIndex = 1;
+            }
         }
     }
 
-    // প্যাড ও স্লিপের সাইজ প্রিসেট ফিল্টার
-    const is2030 = (cat === 'offset_2030' || cat === 'art_2030');
-    const presetSelect = document.getElementById('pad_presetSize');
-    if (presetSelect) {
-        const prevVal = presetSelect.value;
-        if (is2030) {
-            presetSelect.innerHTML = `
-                <option value="5x7.5" selected>5" × 7.5" (1/8 ক্রাউন প্যাড / হাফ সাইজ)</option>
-                <option value="3.76x10">3.76" × 10" (ক্রাউন স্লিপ / লম্বা ভাউচার)</option>
-                <option value="7.5x10">7.5" × 10" (1/4 ক্রাউন প্যাড / বড় সাইজ)</option>
-                <option value="3.75x5">3.75" × 5" (1/16 ক্রাউন - পকেট স্লিপ)</option>
-                <option value="custom">কাস্টম সাইজ (Custom)</option>
-            `;
-        } else {
-            presetSelect.innerHTML = `
-                <option value="3x5.75" selected>3" × 5.75" (পকেট স্লিপ / মানি রসিদ)</option>
-                <option value="3x11.5">3" × 11.5" (লম্বা চিকন স্লিপ/ভাউচার)</option>
-                <option value="4.5x5.75">4.5" × 5.75" (স্ট্যান্ডার্ড প্রেসক্রিপশন প্যাড - 1/16 ডিমাই)</option>
-                <option value="4.5x11.5">4.5" × 11.5" (লম্বা প্রেসক্রিপশন / বড় স্লিপ)</option>
-                <option value="5.75x9">5.75" × 9" (1/8 ডিমাই প্যাড / হাফ সাইজ)</option>
-                <option value="8.5x11">8.5" × 11" (লেটারহেড প্যাড / ফুল সাইজ)</option>
-                <option value="custom">কাস্টম সাইজ (Custom)</option>
-            `;
-        }
-        applyPadSlipPresetSize();
+    if (badge && !skipDetect) {
+        const isCrown = cat === 'offset_2030';
+        badge.innerHTML = isCrown ? 
+            '💡 নির্বাচিত মাদার পেপার: <strong>ক্রাউন (20×30")</strong>' : 
+            '💡 নির্বাচিত মাদার পেপার: <strong>ডাবল ডিমাই (23×36")</strong>';
     }
 
     updatePadPlateDetails();
@@ -3085,10 +3582,14 @@ function applyPadSlipPresetSize() {
     if (parts.length === 2 && l && w) {
         l.value = parts[0];
         w.value = parts[1];
+        autoSelectMotherPaperForPad(parseFloat(parts[0]), parseFloat(parts[1]));
     }
     updatePadBindingRate();
     updatePadPlateDetails();
     checkMachineCapacityWarningFor('pad');
+    if (typeof calculatePadSlipCosting === 'function') {
+        calculatePadSlipCosting();
+    }
 }
 
 function handlePadCustomSizeChange() {
@@ -3106,9 +3607,15 @@ function handlePadCustomSizeChange() {
         }
     }
     if (!match) preset.value = 'custom';
+    if (l > 0 && w > 0) {
+        autoSelectMotherPaperForPad(l, w);
+    }
     updatePadBindingRate();
     updatePadPlateDetails();
     checkMachineCapacityWarningFor('pad');
+    if (typeof calculatePadSlipCosting === 'function') {
+        calculatePadSlipCosting();
+    }
 }
 
 function updatePadBindingRate() {
@@ -3145,7 +3652,10 @@ function updatePadBindingRate() {
 
 function updatePadPlateDetails(skipAutoDetect = false) {
     if (!skipAutoDetect && typeof autoDetectOptimalMachine === 'function') {
-        autoDetectOptimalMachine('pad');
+        autoDetectOptimalMachine('pad', true);
+    } else {
+        const pType = document.getElementById('pad_plateType')?.value || 'demi';
+        selectMachineFor('pad', pType);
     }
     checkMachineCapacityWarningFor('pad');
 }
@@ -3547,89 +4057,6 @@ function calculateAutoCarbonCosting() {
     renderDetailedMachineNote('auto', { itemLabel: 'টি মেমো বই' });
 
     document.getElementById('auto_resultBox').style.display = 'block';
-}
-
-// ==========================================
-// 9. অন্যান্য ছাপার হিসাব (Other Printing Costing)
-// ==========================================
-function calculateOtherPrintingCosting() {
-    const fullL = parseFloat(document.getElementById('oth_sheetLength').value) || 23;
-    const fullW = parseFloat(document.getElementById('oth_sheetWidth').value) || 36;
-    const sheetPrice = parseFloat(document.getElementById('oth_sheetPrice').value) || 0;
-    const cutL = parseFloat(document.getElementById('oth_cutLength').value) || 1;
-    const cutW = parseFloat(document.getElementById('oth_cutWidth').value) || 1;
-    const totalQty = parseInt(document.getElementById('oth_totalQty').value) || 0;
-    const pType = document.getElementById('oth_plateType').value;
-
-    const currentMachine = ALL_PRINT_MACHINES.find(m => m.id === pType) || ALL_PRINT_MACHINES[4];
-    const currentUps = getMachineUpsForSize(currentMachine, cutL, cutW);
-
-    const resBox = document.getElementById('oth_resultBox');
-    const errBox = document.getElementById('oth_resultError');
-    const contentBox = document.getElementById('oth_resultContent');
-
-    if (currentUps === 0) {
-        const compatibleMachines = ALL_PRINT_MACHINES.filter(m => {
-            return getMachineUpsForSize(m, cutL, cutW) > 0;
-        });
-
-        const minComp = compatibleMachines.length > 0 ? compatibleMachines[0] : null;
-
-        if (resBox && errBox && contentBox) {
-            errBox.innerHTML = `
-                <div style="font-size:15px; font-weight:bold; margin-bottom:6px; color:#b91c1c;">
-                    ⛔ ভুল মেশিন নির্বাচন: এই মেশিনে কাজ প্রিন্ট করা সম্ভব নয়!
-                </div>
-                <div style="font-size:13.5px; line-height:1.6; color:#7f1d1d;">
-                    আপনার কাজের সাইজ <strong>${cutL}" × ${cutW}"</strong> যা নির্বাচিত <strong>${currentMachine.name}</strong> মেশিনের মাপের চেয়ে বড়।<br>
-                    ${minComp ? `👉 কাজটি প্রিন্ট করতে আপনাকে অবশ্যই <strong>${minComp.name}</strong> অথবা তার উপরের মেশিন (${compatibleMachines.map(m => m.shortName).join(', ')}) সিলেক্ট করতে হবে।` : 'কাজের সাইজ চেক করুন।'}
-                </div>
-                ${minComp ? `
-                    <button type="button" onclick="selectMachineFor('oth', '${minComp.id}'); calculateOtherPrintingCosting();" style="margin-top:10px; background:#dc2626; color:#fff; border:none; padding:7px 15px; border-radius:6px; font-weight:bold; cursor:pointer;">
-                        🚀 ${minComp.shortName} মেশিনে সেট করে পুনরায় হিসাব করুন
-                    </button>
-                ` : ''}
-            `;
-            errBox.style.display = 'block';
-            contentBox.style.display = 'none';
-            resBox.style.display = 'block';
-            resBox.scrollIntoView({ behavior: 'smooth' });
-        }
-        return;
-    }
-
-    if (errBox) errBox.style.display = 'none';
-    if (contentBox) contentBox.style.display = 'block';
-
-    const out1 = Math.floor(fullL / cutL) * Math.floor(fullW / cutW);
-    const out2 = Math.floor(fullL / cutW) * Math.floor(fullW / cutL);
-    const outPerSheet = Math.max(out1, out2, 1);
-
-    const totalSheets = Math.ceil(totalQty / outPerSheet);
-    const paperCost = totalSheets * sheetPrice;
-
-    const plateCost = parseFloat(document.getElementById('oth_plateCost').value) || 0;
-    const printCost = parseFloat(document.getElementById('oth_printCost').value) || 0;
-    const laminationCost = parseFloat(document.getElementById('oth_laminationCost').value) || 0;
-    const otherCost = parseFloat(document.getElementById('oth_otherCost').value) || 0;
-
-    const grandTotal = paperCost + plateCost + printCost + laminationCost + otherCost;
-    const perUnitCost = totalQty > 0 ? (grandTotal / totalQty) : 0;
-
-    document.getElementById('oth_resOutPerSheet').textContent = `${outPerSheet} পিস`;
-    document.getElementById('oth_resTotalSheets').textContent = `${totalSheets} শিট`;
-    document.getElementById('oth_resPaperCost').textContent = `৳ ${paperCost.toFixed(2)}`;
-    document.getElementById('oth_resPlateCost').textContent = `৳ ${plateCost.toFixed(2)}`;
-    document.getElementById('oth_resPrintCost').textContent = `৳ ${printCost.toFixed(2)}`;
-    document.getElementById('oth_resLaminationCost').textContent = `৳ ${laminationCost.toFixed(2)}`;
-    document.getElementById('oth_resOtherCost').textContent = `৳ ${otherCost.toFixed(2)}`;
-    document.getElementById('oth_resGrandTotal').textContent = `৳ ${grandTotal.toFixed(2)}`;
-    document.getElementById('oth_resPerUnitCost').textContent = `৳ ${perUnitCost.toFixed(2)}`;
-
-    // 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট
-    renderDetailedMachineNote('oth', { itemLabel: 'পিস' });
-
-    document.getElementById('oth_resultBox').style.display = 'block';
 }
 
 // ===================================================
@@ -4069,7 +4496,6 @@ document.addEventListener('keydown', (e) => {
             case 'visiting_card': return 'vc';
             case 'calendar_printing': return 'cal';
             case 'pad_slip': return 'pad';
-            case 'other_printing': return 'oth';
             default: return 'memo';
         }
     }
@@ -4084,7 +4510,6 @@ document.addEventListener('keydown', (e) => {
         if (id.startsWith('cal_')) return 'cal';
         if (id.startsWith('pad_')) return 'pad';
         if (id.startsWith('auto_')) return 'auto';
-        if (id.startsWith('oth_')) return 'oth';
         return 'memo';
     }
 
@@ -4137,9 +4562,6 @@ document.addEventListener('keydown', (e) => {
                 break;
             case 'pad':
                 if (typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();
-                break;
-            case 'oth':
-                if (typeof calculateOtherPrintingCosting === 'function') calculateOtherPrintingCosting();
                 break;
         }
     }

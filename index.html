@@ -28,7 +28,6 @@
                 <option value="visiting_card">📇 ভিজিটিং কার্ড ছাপার হিসাব</option>
                 <option value="calendar_printing">📅 ক্যালেন্ডার ছাপার হিসাব</option>
                 <option value="pad_slip">📝 প্যাড / স্লিপ ছাপার হিসাব</option>
-                <option value="other_printing">📦 অন্যান্য ছাপার হিসাব</option>
             </select>
         </div>
     </div>
@@ -94,10 +93,10 @@
             </div>
             <div class="form-group" id="paperCategory1DisplayGroup">
                 <label id="paperCategory1Label">অফসেট পেপার সাইজ</label>
-                <input type="text" id="paperCategory1Display" readonly class="form-control" style="background:#f8fafc; font-weight:600; color:#334155;" value="23 × 36&quot; (ডিমাই সাইজ)">
+                <input type="text" id="paperCategory1Display" readonly class="form-control" style="background:#f8fafc; font-weight:600; color:#334155;" value="23 × 36&quot; (ডাবল ডিমাই সাইজ)">
                 <select id="paperCategory1Select" class="form-control" style="display:none; border:1.5px solid #f59e0b; background:#fffbeb;" onchange="onCustomPaperCategorySelected()">
                     <option value="none">মাদার পেপার সাইজ নাই</option>
-                    <option value="2336">23 × 36" (ডিমাই সাইজ)</option>
+                    <option value="2336">23 × 36" (ডাবল ডিমাই সাইজ)</option>
                     <option value="2030">20 × 30" (ক্রাউন সাইজ)</option>
                 </select>
                 <div id="paperCategory1Warning" style="display:none; color:#dc2626; font-size:12px; margin-top:4px; font-weight:600;">
@@ -399,8 +398,8 @@
 
                 <div class="master-group-box">
                     <div class="master-group-header">
-                        <span class="master-group-pill pill-paper">📄 ডিমাই সাইজ</span>
-                        <span>অফসেট পেপার (23×36" ডিমাই সাইজ - ৳/রিম):</span>
+                        <span class="master-group-pill pill-paper">📄 ডাবল ডিমাই সাইজ</span>
+                        <span>অফসেট পেপার (23×36" ডাবল ডিমাই সাইজ - ৳/রিম):</span>
                     </div>
                     <div class="grid-3">
                         <div class="form-group"><label>65 GSM</label><input type="number" id="cfg_off23_65" value="2550"></div>
@@ -625,10 +624,10 @@
                 </div>
                 <div class="form-group" id="sp_paperCategoryDisplayGroup">
                     <label id="sp_paperCategoryLabel">অফসেট পেপার সাইজ</label>
-                    <input type="text" id="sp_paperCategoryDisplay" readonly class="form-control" style="background:#f8fafc; font-weight:600; color:#334155;" value="23 × 36&quot; (ডিমাই সাইজ)">
+                    <input type="text" id="sp_paperCategoryDisplay" readonly class="form-control" style="background:#f8fafc; font-weight:600; color:#334155;" value="23 × 36&quot; (ডাবল ডিমাই সাইজ)">
                     <select id="sp_paperCategorySelect" class="form-control" style="display:none; border:1.5px solid #f59e0b; background:#fffbeb;" onchange="onSinglePaperCustomCategorySelected()">
                         <option value="none">মাদার পেপার সাইজ নাই</option>
-                        <option value="2336">23 × 36" (ডিমাই সাইজ)</option>
+                        <option value="2336">23 × 36" (ডাবল ডিমাই সাইজ)</option>
                         <option value="2030">20 × 30" (ক্রাউন সাইজ)</option>
                     </select>
                     <div id="sp_paperCategoryWarning" style="display:none; font-size:12.5px; font-weight:600; margin-top:4px;"></div>
@@ -758,86 +757,24 @@
         </div>
     </div>
 
-        <button class="btn-submit" onclick="calculateSinglePaperCosting()">সিঙ্গেল পেপার কস্টিং হিসাব করুন</button>
-
-        <div class="single-result-box" id="sp_resultBox">
-            <div id="sp_resultError" style="display:none; padding:15px; background:#fef2f2; border:2px solid #ef4444; border-radius:8px; color:#991b1b; margin-bottom:12px;"></div>
-            <div id="sp_resultContent">
-                <h3>📊 সিঙ্গেল পেপার কস্টিং সামারি</h3>
-                <div class="result-item">
-                    <span>এক ফুল শিটে বের হবে (Up):</span>
-                    <span id="sp_resOutPerSheet">0 পিস</span>
-                </div>
-                <div class="result-item">
-                    <span>মোট প্রয়োজনীয় কাগজ:</span>
-                    <span id="sp_resTotalSheets">0 শিট (0 রিম)</span>
-                </div>
-                <div class="divider-title">🛠️ খরচের বিস্তারিত বিবরণী:</div>
-                <div class="result-item">
-                    <span>কাগজের মোট দাম:</span>
-                    <span id="sp_resPaperCost">৳ 0.00</span>
-                </div>
-                <div class="result-item">
-                    <span>প্লেট খরচ:</span>
-                    <span id="sp_resPlateCost">৳ 0.00</span>
-                </div>
-                <div class="result-item">
-                    <span>ছাপা খরচ:</span>
-                    <span id="sp_resPrintCost">৳ 0.00</span>
-                </div>
-                <div class="result-item">
-                    <span>কাটিং ও অন্যান্য খরচ:</span>
-                    <span id="sp_resOtherCost">৳ 0.00</span>
-                </div>
-                <div class="result-item total-row">
-                    <span>সর্বমোট খরচ:</span>
-                    <span id="sp_resGrandTotal" class="highlight-offset">৳ 0.00</span>
-                </div>
-                <div class="result-item">
-                    <span>প্রতি পিসের গড় খরচ:</span>
-                    <span id="sp_resPerUnitCost" style="font-weight:bold; color:#16a34a;">৳ 0.00</span>
-                </div>
-                <!-- 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট -->
-                <div id="sp_resMachineNoteBox" style="margin-top:14px; padding:12px 14px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; font-size:13.5px; color:#1e40af; line-height:1.6;"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- 3. পোস্টার / হ্যান্ডবিল ছাপার হিসাব (মডিউল) -->
     <div id="posterCostingSection" style="display:none;">
-        <div class="section section-optional">
-            <div class="section-title">📢 1. পোস্টার / হ্যান্ডবিল কাগজের বিবরণী</div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>কাগজের ক্যাটাগরি ও সাইজ</label>
-                    <select id="pos_paperCategory" onchange="updatePosterPaperOptions()">
-                        <option value="art_2336" selected>আর্ট পেপার (23 × 36")</option>
-                        <option value="art_2030">আর্ট পেপার (20 × 30")</option>
-                        <option value="offset_2336">অফসেট পেপার (23 × 36")</option>
-                        <option value="offset_2030">অফসেট পেপার (20 × 30")</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>কাগজের কোয়ালিটি / GSM ও দাম</label>
-                    <select id="pos_paperGsmRate"></select>
-                </div>
-            </div>
-        </div>
-
+        <!-- 1. কাজের সাইজ ও কপির সংখ্যা -->
         <div class="section">
-            <div class="section-title">✂️ 2. পোস্টার সাইজ ও কোয়ান্টিটি</div>
+            <div class="section-title">✂️ 1. কাজের সাইজ ও কপির সংখ্যা</div>
             <div class="grid-3">
                 <div class="form-group">
-                    <label>পোস্টার / হ্যান্ডবিল সাইজ</label>
+                    <label>কাটা পিসের সাইজ (দৈর্ঘ্য × প্রস্থ)</label>
                     <select id="pos_presetSize" onchange="applyPosterPresetSize()">
                         <option value="5.75x9">5.75 × 9 ইঞ্চি (1/8 ডিমাই / ছোট হ্যান্ডবিল)</option>
                         <option value="9x11.5">9 × 11.5 ইঞ্চি (1/4 ডিমাই / A4 হ্যান্ডবিল)</option>
                         <option value="11.5x18" selected>11.5 × 18 ইঞ্চি (1/2 ডিমাই / ছোট পোস্টার)</option>
                         <option value="18x23">18 × 23 ইঞ্চি (ডিমাই ফুল পোস্টার)</option>
+                        <option value="7.5x10">7.5 × 10 ইঞ্চি (1/4 ক্রাউন হ্যান্ডবিল)</option>
                         <option value="15x20">15 × 20 ইঞ্চি (ক্রাউন সাইজ পোস্টার)</option>
                         <option value="20x30">20 × 30 ইঞ্চি (ডাবল ক্রাউন পোস্টার)</option>
                         <option value="23x36">23 × 36 ইঞ্চি (ডাবল ডিমাই পোস্টার)</option>
-                        <option value="custom">কাস্টম সাইজ লিখুন...</option>
+                        <option value="custom">কাস্টম সাইজ নিজে লিখুন...</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -851,16 +788,45 @@
             </div>
             <div class="form-group">
                 <label>মোট পোস্টার / হ্যান্ডবিল সংখ্যা</label>
-                <input type="number" id="pos_totalQty" value="1000">
+                <input type="number" id="pos_totalQty" value="1000" oninput="updatePosterPlateDetails(); if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
             </div>
         </div>
 
+        <!-- 2. কাগজের বিবরণী -->
+        <div class="section section-optional">
+            <div class="section-title">📄 2. কাগজের বিবরণী</div>
+            <input type="hidden" id="pos_paperCategory" value="art_2336">
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>কাগজের ধরন (Paper Type)</label>
+                    <select id="pos_paperMainType" onchange="onPosterPaperMainTypeChange()">
+                        <option value="art" selected>আর্ট পেপার (Art Paper)</option>
+                        <option value="offset">অফসেট পেপার (Offset Paper)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="pos_paperCategoryDisplayGroup">
+                    <label id="pos_paperCategoryLabel">আর্ট পেপার সাইজ</label>
+                    <input type="text" id="pos_paperCategoryDisplay" readonly class="form-control" style="background:#f8fafc; font-weight:600; color:#334155;" value="23 × 36&quot; (ডাবল ডিমাই সাইজ)">
+                    <select id="pos_paperCategorySelect" class="form-control" style="display:none; border:1.5px solid #f59e0b; background:#fffbeb;" onchange="onPosterCustomCategorySelected()">
+                        <option value="2336">23 × 36" (ডাবল ডিমাই সাইজ)</option>
+                        <option value="2030">20 × 30" (ক্রাউন সাইজ)</option>
+                    </select>
+                    <div id="pos_paperCategoryWarning" style="display:none; font-size:12.5px; font-weight:600; margin-top:4px;"></div>
+                </div>
+                <div class="form-group">
+                    <label>কাগজের কোয়ালিটি ও দাম (GSM)</label>
+                    <select id="pos_paperGsmRate" onchange="if(typeof calculatePosterCosting === 'function') calculatePosterCosting();"></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. প্লেট ও ছাপা খরচ -->
         <div class="section">
-            <div class="section-title">🖨️ 3. প্লেট, ছাপা ও ফিনিশিং খরচ</div>
+            <div class="section-title">🖨️ 3. প্লেট ও ছাপা খরচ</div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>প্লেট ও মেশিনের টাইপ</label>
-                    <select id="pos_plateType" onchange="updatePosterPlateDetails(true); checkMachineCapacityWarningFor('pos');">
+                    <select id="pos_plateType" onchange="updatePosterPlateDetails(true); checkMachineCapacityWarningFor('pos'); if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
                         <option value="mini_half">মিনি হাফ (10×16") [প্রিন্ট: 9×14"]</option>
                         <option value="hasi">হাসি (16×20") [প্রিন্ট: 11.5×18"]</option>
                         <option value="gto">GTO-জিটিও (15.75×21") [প্রিন্ট: 13.5×20"]</option>
@@ -873,7 +839,7 @@
                 </div>
                 <div class="form-group">
                     <label>রং/কালার সংখ্যা</label>
-                    <select id="pos_colorCount" onchange="updatePosterPlateDetails(); checkMachineCapacityWarningFor('pos');">
+                    <select id="pos_colorCount" onchange="updatePosterPlateDetails(); checkMachineCapacityWarningFor('pos'); if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
                         <option value="1">1 কালার (1 Color)</option>
                         <option value="2">2 কালার (2 Colors)</option>
                         <option value="3">3 কালার (3 Colors)</option>
@@ -885,32 +851,34 @@
             <!-- ⚠️ ভুল মেশিন নির্বাচন সতর্কবার্তা (Warning Box) -->
             <div id="pos_machineWarningBox" style="display:none; margin-bottom:15px; padding:12px 15px; background:#fef2f2; border:1.5px solid #f87171; border-radius:8px; color:#991b1b;"></div>
 
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>লেমিনেশন / ফিনিশিং</label>
-                    <select id="pos_laminationType" onchange="updatePosterLaminationCost()">
-                        <option value="none" selected>কোনো লেমিনেশন নেই</option>
-                        <option value="gloss">গ্লস লেমিনেশন (Gloss Lamination)</option>
-                        <option value="matt">ম্যাট লেমিনেশন (Matt Lamination)</option>
-                    </select>
+            <!-- ৪টি কালার রেট প্রিভিউ বাটন/বক্স (ক্যাশ মেমোর মত) -->
+            <div class="grid-4" id="pos_printColorPresetsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:12px;">
+                <div class="form-group" id="pos_preset1ColorGroup">
+                    <label>1-কালার ছাপা রেট</label>
+                    <input type="text" id="pos_printRate1Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onPosterColorPrintPresetClick(1)" title="১-কালার সিলেক্ট করতে ক্লিক করুন">
                 </div>
-                <div class="form-group">
-                    <label>লেমিনেশন খরচ মোট (৳)</label>
-                    <input type="number" id="pos_laminationCost" value="0" step="any">
+                <div class="form-group" id="pos_preset2ColorGroup">
+                    <label>2-কালার ছাপা রেট</label>
+                    <input type="text" id="pos_printRate2Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onPosterColorPrintPresetClick(2)" title="২-কালার সিলেক্ট করতে ক্লিক করুন">
+                </div>
+                <div class="form-group" id="pos_preset3ColorGroup">
+                    <label>3-কালার ছাপা রেট</label>
+                    <input type="text" id="pos_printRate3Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onPosterColorPrintPresetClick(3)" title="৩-কালার সিলেক্ট করতে ক্লিক করুন">
+                </div>
+                <div class="form-group" id="pos_preset4ColorGroup">
+                    <label>4-কালার ছাপা রেট</label>
+                    <input type="text" id="pos_printRate4Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onPosterColorPrintPresetClick(4)" title="৪-কালার সিলেক্ট করতে ক্লিক করুন">
                 </div>
             </div>
-            <div class="grid-3">
+
+            <div class="grid-2">
                 <div class="form-group">
                     <label>প্লেট খরচ মোট (৳)</label>
                     <input type="number" id="pos_plateCost" readonly value="880">
                 </div>
                 <div class="form-group">
                     <label>ছাপা খরচ (৳)</label>
-                    <input type="number" id="pos_printCost" value="1200" step="any">
-                </div>
-                <div class="form-group">
-                    <label>কাটিং ও প্যাকিং খরচ (৳)</label>
-                    <input type="number" id="pos_otherCost" value="100" step="any">
+                    <input type="number" id="pos_printCost" value="1200" step="any" oninput="if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
                 </div>
             </div>
 
@@ -935,51 +903,74 @@
             </div>
         </div>
 
+        <!-- 4. লেমিনেশন, কাটিং ও ফিনিশিং খরচ -->
+        <div class="section">
+            <div class="section-title">🎨 4. লেমিনেশন, কাটিং ও ফিনিশিং খরচ</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>লেমিনেশন / ফিনিশিং</label>
+                    <select id="pos_laminationType" onchange="updatePosterLaminationCost(); if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
+                        <option value="none" selected>কোনো লেমিনেশন নেই</option>
+                        <option value="gloss">গ্লস লেমিনেশন (Gloss Lamination)</option>
+                        <option value="matt">ম্যাট লেমিনেশন (Matt Lamination)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>লেমিনেশন খরচ মোট (৳)</label>
+                    <input type="number" id="pos_laminationCost" value="0" step="any" oninput="if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>কাটিং ও প্যাকিং খরচ (৳)</label>
+                <input type="number" id="pos_otherCost" value="100" step="any" oninput="if(typeof calculatePosterCosting === 'function') calculatePosterCosting();">
+            </div>
+        </div>
+
         <button class="btn-submit" onclick="calculatePosterCosting()">পোস্টার / হ্যান্ডবিল কস্টিং হিসাব করুন</button>
 
         <div class="single-result-box" id="pos_resultBox">
             <div id="pos_resultError" style="display:none; padding:15px; background:#fef2f2; border:2px solid #ef4444; border-radius:8px; color:#991b1b; margin-bottom:12px;"></div>
             <div id="pos_resultContent">
                 <h3>📊 পোস্টার / হ্যান্ডবিল কস্টিং সামারি</h3>
-            <div class="result-item">
-                <span>এক ফুল শিটে বের হবে (Up):</span>
-                <span id="pos_resOutPerSheet">0 পিস</span>
-            </div>
-            <div class="result-item">
-                <span>মোট প্রয়োজনীয় কাগজ:</span>
-                <span id="pos_resTotalSheets">0 শিট (0 রিম)</span>
-            </div>
-            <div class="divider-title">🛠️ খরচের বিস্তারিত বিবরণী:</div>
-            <div class="result-item">
-                <span>কাগজের মোট দাম:</span>
-                <span id="pos_resPaperCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>প্লেট খরচ:</span>
-                <span id="pos_resPlateCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>ছাপা খরচ:</span>
-                <span id="pos_resPrintCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>লেমিনেশন খরচ:</span>
-                <span id="pos_resLaminationCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>কাটিং ও অন্যান্য খরচ:</span>
-                <span id="pos_resOtherCost">৳ 0.00</span>
-            </div>
-            <div class="result-item total-row">
-                <span>সর্বমোট পোস্টার খরচ:</span>
-                <span id="pos_resGrandTotal" class="highlight-offset">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>প্রতি পোস্টার গড় খরচ:</span>
-                <span id="pos_resPerUnitCost" style="font-weight:bold; color:#16a34a;">৳ 0.00</span>
-            </div>
-            <!-- 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট -->
-            <div id="pos_resMachineNoteBox" style="margin-top:14px; padding:12px 14px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; font-size:13.5px; color:#1e40af; line-height:1.6;"></div>
+                <div class="result-item">
+                    <span>এক ফুল শিটে বের হবে (Up):</span>
+                    <span id="pos_resOutPerSheet">0 পিস</span>
+                </div>
+                <div class="result-item">
+                    <span>মোট প্রয়োজনীয় কাগজ:</span>
+                    <span id="pos_resTotalSheets">0 শিট (0 রিম)</span>
+                </div>
+                <div class="divider-title">🛠️ খরচের বিস্তারিত বিবরণী:</div>
+                <div class="result-item">
+                    <span>কাগজের মোট দাম:</span>
+                    <span id="pos_resPaperCost">৳ 0.00</span>
+                </div>
+                <div class="result-item">
+                    <span>প্লেট খরচ:</span>
+                    <span id="pos_resPlateCost">৳ 0.00</span>
+                </div>
+                <div class="result-item">
+                    <span>ছাপা খরচ:</span>
+                    <span id="pos_resPrintCost">৳ 0.00</span>
+                </div>
+                <div class="result-item">
+                    <span>লেমিনেশন খরচ:</span>
+                    <span id="pos_resLaminationCost">৳ 0.00</span>
+                </div>
+                <div class="result-item">
+                    <span>কাটিং ও অন্যান্য খরচ:</span>
+                    <span id="pos_resOtherCost">৳ 0.00</span>
+                </div>
+                <div class="result-item total-row">
+                    <span>সর্বমোট পোস্টার খরচ:</span>
+                    <span id="pos_resGrandTotal" class="highlight-offset">৳ 0.00</span>
+                </div>
+                <div class="result-item">
+                    <span>প্রতি পোস্টার গড় খরচ:</span>
+                    <span id="pos_resPerUnitCost" style="font-weight:bold; color:#16a34a;">৳ 0.00</span>
+                </div>
+                <!-- 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট -->
+                <div id="pos_resMachineNoteBox" style="margin-top:14px; padding:12px 14px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; font-size:13.5px; color:#1e40af; line-height:1.6;"></div>
             </div>
         </div>
     </div>
@@ -1422,8 +1413,9 @@
 
     <!-- 6. ক্যালেন্ডার ছাপার হিসাব (মডিউল) -->
     <div id="calendarCostingSection" style="display:none;">
-        <div class="section section-optional">
-            <div class="section-title">📅 1. ক্যালেন্ডার টাইপ ও কাগজের বিবরণী</div>
+        <!-- 1. কাজের সাইজ ও কপির সংখ্যা -->
+        <div class="section">
+            <div class="section-title">✂️ 1. কাজের সাইজ ও কপির সংখ্যা</div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>ক্যালেন্ডারের ধরণ</label>
@@ -1441,32 +1433,12 @@
                 </div>
                 <div class="form-group">
                     <label>প্রতি ক্যালেন্ডারে পাতা/শিট সংখ্যা</label>
-                    <input type="number" id="cal_leavesCount" value="1" readonly>
+                    <input type="number" id="cal_leavesCount" value="1" readonly style="background:#f8fafc; font-weight:bold;">
                 </div>
             </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>কাগজের ক্যাটাগরি ও সাইজ</label>
-                    <select id="cal_paperCategory" onchange="updateCalendarPaperOptions()">
-                        <option value="art_2336" selected>আর্ট পেপার (23 × 36")</option>
-                        <option value="art_2030">আর্ট পেপার (20 × 30")</option>
-                        <option value="card_art_2228">আর্ট কার্ড / সুইডিশ বোর্ড (22 × 28") [ডেস্ক ক্যালেন্ডার]</option>
-                        <option value="offset_2336">অফসেট পেপার (23 × 36")</option>
-                        <option value="offset_2030">অফসেট পেপার (20 × 30")</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>কাগজের GSM ও রিম/পাতার দাম</label>
-                    <select id="cal_paperGsmRate"></select>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">✂️ 2. সাইজ ও ক্যালেন্ডার সংখ্যা</div>
             <div class="grid-3">
                 <div class="form-group">
-                    <label>ক্যালেন্ডারের সাইজ</label>
+                    <label>কাটা পিসের সাইজ (দৈর্ঘ্য × প্রস্থ)</label>
                     <select id="cal_presetSize" onchange="applyCalendarPresetSize()">
                         <optgroup label="ওয়াল ক্যালেন্ডারের সাইজ">
                             <option value="11.5x18">11.5 × 18 ইঞ্চি (1/2 ডিমাই)</option>
@@ -1482,30 +1454,53 @@
                             <option value="7x7">7 × 7 ইঞ্চি (ডেস্ক - স্কয়ার)</option>
                             <option value="8.25x4">8.25 × 4 ইঞ্চি (ডেস্ক - স্লিম ক্যালেন্ডার)</option>
                         </optgroup>
-                        <option value="custom">কাস্টম সাইজ লিখুন...</option>
+                        <option value="custom">কাস্টম সাইজ নিজে লিখুন...</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>লম্বা (")</label>
+                    <label>লম্বা (ইঞ্চি)</label>
                     <input type="number" id="cal_cutLength" value="18" step="any" oninput="autoSelectCalendarPresetSize()">
                 </div>
                 <div class="form-group">
-                    <label>চওড়া (")</label>
+                    <label>চওড়া (ইঞ্চি)</label>
                     <input type="number" id="cal_cutWidth" value="23" step="any" oninput="autoSelectCalendarPresetSize()">
                 </div>
             </div>
             <div class="form-group">
-                <label>মোট ক্যালেন্ডার সংখ্যা (পিস)</label>
-                <input type="number" id="cal_totalQty" value="500">
+                <label>মোট ক্যালেন্ডার সংখ্যা (কপি)</label>
+                <input type="number" id="cal_totalQty" value="500" oninput="updateCalendarPlateDetails(); if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();">
             </div>
         </div>
 
+        <!-- 2. কাগজের বিবরণী (ক্যালেন্ডারে শুধুমাত্র আর্ট পেপার / আর্ট কার্ড) -->
+        <div class="section section-optional">
+            <div class="section-title">📄 2. কাগজের বিবরণী (আর্ট পেপার / বোর্ড)</div>
+            <input type="hidden" id="cal_paperCategory" value="art_2336">
+            <div class="grid-2">
+                <div class="form-group" id="cal_paperCategoryDisplayGroup">
+                    <label id="cal_paperCategoryLabel">আর্ট পেপারের সাইজ (মাদার সাইজ)</label>
+                    <input type="text" id="cal_paperCategoryDisplay" readonly class="form-control" style="background:#f8fafc; font-weight:600; color:#334155;" value="23 × 36&quot; (ডাবল ডিমাই সাইজ)">
+                    <select id="cal_paperCategorySelect" class="form-control" style="display:none; border:1.5px solid #f59e0b; background:#fffbeb;" onchange="onCalendarCustomCategorySelected()">
+                        <option value="art_2336">আর্ট পেপার (23 × 36" ডাবল ডিমাই)</option>
+                        <option value="art_2030">আর্ট পেপার (20 × 30" ক্রাউন)</option>
+                        <option value="card_art_2228">আর্ট কার্ড / সুইডিশ বোর্ড (22 × 28")</option>
+                    </select>
+                    <div id="cal_paperCategoryWarning" style="display:none; font-size:12.5px; font-weight:600; margin-top:4px;"></div>
+                </div>
+                <div class="form-group">
+                    <label>কাগজের কোয়ালিটি / GSM ও দাম</label>
+                    <select id="cal_paperGsmRate" onchange="if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();"></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. প্লেট, ছাপা ও বাইন্ডিং / ফিটিংস খরচ -->
         <div class="section">
-            <div class="section-title">🖨️ 3. প্লেট, ছাপা ও বাইন্ডিং / ফিটিংস খরচ</div>
+            <div class="section-title">🖨️ 3. প্লেট, ছাপা ও ফিটিংস খরচ</div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>প্লেট ও মেশিনের টাইপ</label>
-                    <select id="cal_plateType" onchange="updateCalendarPlateDetails(true); checkMachineCapacityWarningFor('cal');">
+                    <select id="cal_plateType" onchange="updateCalendarPlateDetails(true); checkMachineCapacityWarningFor('cal'); if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();">
                         <option value="mini_half">মিনি হাফ (10×16") [প্রিন্ট: 9×14"]</option>
                         <option value="hasi">হাসি (16×20") [প্রিন্ট: 11.5×18"]</option>
                         <option value="gto">GTO-জিটিও (15.75×21") [প্রিন্ট: 13.5×20"]</option>
@@ -1518,10 +1513,11 @@
                 </div>
                 <div class="form-group">
                     <label>রং/কালার সংখ্যা</label>
-                    <select id="cal_colorCount" onchange="updateCalendarPlateDetails(); checkMachineCapacityWarningFor('cal');">
-                        <option value="4" selected>4 কালার (4 Colors / মাল্টিকালার)</option>
-                        <option value="2">2 কালার (2 Colors)</option>
+                    <select id="cal_colorCount" onchange="updateCalendarPlateDetails(); checkMachineCapacityWarningFor('cal'); if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();">
                         <option value="1">1 কালার (1 Color)</option>
+                        <option value="2">2 কালার (2 Colors)</option>
+                        <option value="3">3 কালার (3 Colors)</option>
+                        <option value="4" selected>4 কালার (4 Colors / মাল্টিকালার)</option>
                     </select>
                 </div>
             </div>
@@ -1529,30 +1525,50 @@
             <!-- ⚠️ ভুল মেশিন নির্বাচন সতর্কবার্তা (Warning Box) -->
             <div id="cal_machineWarningBox" style="display:none; margin-bottom:15px; padding:12px 15px; background:#fef2f2; border:1.5px solid #f87171; border-radius:8px; color:#991b1b;"></div>
 
+            <!-- ৪টি কালার রেট প্রিভিউ বাটন/বক্স -->
+            <div class="grid-4" id="cal_printColorPresetsGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:12px;">
+                <div class="form-group" id="cal_preset1ColorGroup">
+                    <label>1-কালার ছাপা রেট</label>
+                    <input type="text" id="cal_printRate1Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onCalendarColorPrintPresetClick(1)" title="১-কালার সিলেক্ট করতে ক্লিক করুন">
+                </div>
+                <div class="form-group" id="cal_preset2ColorGroup">
+                    <label>2-কালার ছাপা রেট</label>
+                    <input type="text" id="cal_printRate2Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onCalendarColorPrintPresetClick(2)" title="২-কালার সিলেক্ট করতে ক্লিক করুন">
+                </div>
+                <div class="form-group" id="cal_preset3ColorGroup">
+                    <label>3-কালার ছাপা রেট</label>
+                    <input type="text" id="cal_printRate3Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onCalendarColorPrintPresetClick(3)" title="৩-কালার সিলেক্ট করতে ক্লিক করুন">
+                </div>
+                <div class="form-group" id="cal_preset4ColorGroup">
+                    <label>4-কালার ছাপা রেট</label>
+                    <input type="text" id="cal_printRate4Color" readonly class="form-control" style="background:#f8fafc; border:1px solid #cbd5e1; font-weight:600; color:#334155; text-align:center; cursor:pointer;" onclick="onCalendarColorPrintPresetClick(4)" title="৪-কালার সিলেক্ট করতে ক্লিক করুন">
+                </div>
+            </div>
+
             <div class="grid-2">
                 <div class="form-group">
                     <label>বাইন্ডিং / ফিটিংস ও স্ট্যান্ড টাইপ</label>
-                    <select id="cal_bindingType" onchange="updateCalendarBindingRate()">
-                        <option value="tin_pipe" selected>টিন পাইপ ও হুক ফিটিং (Tin Strip - ওয়াল ক্যালেন্ডার)</option>
-                        <option value="spiral_wall">স্পাইরাল ওয়্যার-ও ও হ্যাঙ্গার (ওয়াল ক্যালেন্ডার)</option>
-                        <option value="desk_stand_standard">ডেস্ক ক্যালেন্ডার হার্ডবোর্ড স্ট্যান্ড + ওয়্যার-ও স্পাইরাল (স্ট্যান্ডার্ড)</option>
-                        <option value="desk_stand_premium">ডেস্ক ক্যালেন্ডার রিজিড হার্ডবোর্ড + লেমিনেশন + প্রিমিয়াম স্পাইরাল</option>
-                        <option value="none">কোনো বাইন্ডিং নেই (৳0)</option>
+                    <select id="cal_bindingType" onchange="updateCalendarBindingRate(); if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();">
+                        <option value="tin_pipe" selected>টিন বাধাই</option>
+                        <option value="fiber_binding">ফাইবার বাধাই</option>
+                        <option value="spiral_wall">স্পাইরাল বাধাই</option>
+                        <option value="desk_stand_standard">ডেক্স ক্যালেন্ডার বাধাই</option>
+                        <option value="none">কোন বাধাই খরচ নাই</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>প্রতি ক্যালেন্ডার বাইন্ডিং/স্ট্যান্ড দর (৳)</label>
-                    <input type="number" id="cal_bindingPerRate" value="6" step="any">
+                    <input type="number" id="cal_bindingPerRate" value="6" step="any" oninput="if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="form-group">
                     <label>প্লেট খরচ মোট (৳)</label>
-                    <input type="number" id="cal_plateCost" value="880" step="any">
+                    <input type="number" id="cal_plateCost" value="880" readonly step="any">
                 </div>
                 <div class="form-group">
                     <label>ছাপা খরচ (৳)</label>
-                    <input type="number" id="cal_printCost" value="1200" step="any">
+                    <input type="number" id="cal_printCost" value="1200" step="any" oninput="if(typeof calculateCalendarCosting === 'function') calculateCalendarCosting();">
                 </div>
             </div>
 
@@ -1624,42 +1640,22 @@
 
     <!-- 7. প্যাড / স্লিপ ছাপার হিসাব (মডিউল) -->
     <div id="padSlipCostingSection" style="display:none;">
-        <div class="section section-optional">
-            <div class="section-title">📝 1. প্যাড / স্লিপ পেপারের বিবরণী</div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>কাগজের ক্যাটাগরি ও সাইজ</label>
-                    <select id="pad_paperCategory" onchange="updatePadSlipPaperOptions()">
-                        <option value="offset_2336" selected>অফসেট পেপার (23 × 36") [স্ট্যান্ডার্ড ডিমাই]</option>
-                        <option value="offset_2030">অফসেট পেপার (20 × 30") [ক্রাউন সাইজ]</option>
-                        <option value="art_2336">আর্ট পেপার (23 × 36")</option>
-                        <option value="art_2030">আর্ট পেপার (20 × 30")</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>কাগজের কোয়ালিটি / GSM ও দাম</label>
-                    <select id="pad_paperGsmRate" onchange="updatePadPlateDetails()"></select>
-                </div>
-            </div>
-            <div style="font-size:12.5px; color:#64748b; margin-top:4px;">
-                💡 <em>নোট: প্যাড ও স্লিপে কোনো ডুপ্লিকেট বা নিউজপ্রিন্ট কপি থাকে না, শুধুমাত্র মূল পেপার আঠা বাঁধাই হয়ে তৈরি হয়।</em>
-            </div>
-        </div>
-
         <div class="section">
-            <div class="section-title">✂️ 2. প্যাডের সাইজ, পাতা ও মোট পরিমাণ</div>
+            <div class="section-title">✂️ 1. প্যাডের সাইজ, পাতা ও মোট পরিমাণ (কাট সাইজ)</div>
             <div class="grid-3">
                 <div class="form-group">
                     <label>প্যাড / স্লিপ সাইজ প্রিসেট</label>
                     <select id="pad_presetSize" onchange="applyPadSlipPresetSize()">
-                        <option value="3x11.5">3" × 11.5" (লম্বা চিকন স্লিপ/ভাউচার)</option>
-                        <option value="3x5.75" selected>3" × 5.75" (পকেট স্লিপ / মানি রসিদ)</option>
-                        <option value="4.5x11.5">4.5" × 11.5" (লম্বা প্রেসক্রিপশন / বড় স্লিপ)</option>
-                        <option value="4.5x5.75">4.5" × 5.75" (স্ট্যান্ডার্ড প্রেসক্রিপশন প্যাড - 1/16 ডিমাই)</option>
-                        <option value="3.76x10">3.76" × 10" (ক্রাউন স্লিপ / বিশেষ সাইজ)</option>
-                        <option value="3.83x9">3.83" × 9" (স্লিম মেমো / ভাউচার স্লিপ)</option>
-                        <option value="5.75x9">5.75" × 9" (1/8 ডিমাই প্যাড / হাফ সাইজ)</option>
-                        <option value="8.5x11">8.5" × 11" (লেটারহেড প্যাড / ফুল সাইজ)</option>
+                        <option value="3x5.75" selected>3" × 5.75" (পকেট স্লিপ / মানি রসিদ - ১/৩২ ডিমাই)</option>
+                        <option value="3x11.5">3" × 11.5" (লম্বা চিকন স্লিপ/ভাউচার - ১/১৬ ডিমাই)</option>
+                        <option value="4.5x5.75">4.5" × 5.75" (স্ট্যান্ডার্ড প্রেসক্রিপশন প্যাড - ১/১৬ ডিমাই)</option>
+                        <option value="4.5x11.5">4.5" × 11.5" (লম্বা প্রেসক্রিপশন / বড় স্লিপ - ১/৮ ডিমাই)</option>
+                        <option value="5.75x9">5.75" × 9" (১/৮ ডিমাই প্যাড / হাফ সাইজ)</option>
+                        <option value="9x11.5">9" × 11.5" (লেটারহেড প্যাড / ফুল সাইজ)</option>
+                        <option value="3.75x5">3.75" × 5" (১/১৬ ক্রাউন - পকেট স্লিপ)</option>
+                        <option value="3.76x10">3.76" × 10" (ক্রাউন স্লিপ / লম্বা ভাউচার)</option>
+                        <option value="5x7.5">5" × 7.5" (১/৮ ক্রাউন প্যাড / হাফ সাইজ)</option>
+                        <option value="7.5x10">7.5" × 10" (১/৪ ক্রাউন প্যাড / বড় সাইজ)</option>
                         <option value="custom">কাস্টম সাইজ (Custom)</option>
                     </select>
                 </div>
@@ -1675,7 +1671,7 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label>প্রতি প্যাডে পাতার সংখ্যা (Sheets)</label>
-                    <select id="pad_leavesCount" onchange="updatePadBindingRate(); updatePadPlateDetails();">
+                    <select id="pad_leavesCount" onchange="updatePadBindingRate(); updatePadPlateDetails(); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
                         <option value="100" selected>100 পাতা (100 Leaves)</option>
                         <option value="150">150 পাতা (150 Leaves)</option>
                         <option value="200">200 পাতা (200 Leaves)</option>
@@ -1683,8 +1679,36 @@
                 </div>
                 <div class="form-group">
                     <label>মোট প্যাড / বই সংখ্যা (Pads/Books)</label>
-                    <input type="number" id="pad_totalQty" value="50" oninput="updatePadPlateDetails()">
+                    <input type="number" id="pad_totalQty" value="50" oninput="updatePadPlateDetails(); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
                 </div>
+            </div>
+        </div>
+
+        <div class="section section-optional">
+            <div class="section-title">📝 2. প্যাড পেপারের বিবরণী (অফসেট পেপার)</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>কাগজের ক্যাটাগরি ও মাদার সাইজ</label>
+                    <select id="pad_paperCategory" onchange="updatePadSlipPaperOptions(); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
+                        <option value="offset_2336" selected>অফসেট পেপার (23 × 36") [ডাবল ডিমাই সাইজ]</option>
+                        <option value="offset_2030">অফসেট পেপার (20 × 30") [ক্রাউন সাইজ]</option>
+                    </select>
+                    <div id="pad_motherPaperAutoBadge" style="display:inline-block; font-size:12px; background:#eff6ff; color:#1d4ed8; padding:3px 8px; border-radius:4px; margin-top:5px; border:1px solid #bfdbfe;">
+                        💡 সাইজ অনুযায়ী মাদার পেপার অটো সিলেক্টেড: <strong>ডাবল ডিমাই (23×36")</strong>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>কাগজের কোয়ালিটি / GSM ও দাম</label>
+                    <select id="pad_paperGsmRate" onchange="updatePadPlateDetails(); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
+                        <option value="5.10">65 GSM (৳2550/রিম - ৳5.10/পাতা)</option>
+                        <option value="5.40" selected>70 GSM (৳2700/রিম - ৳5.40/পাতা)</option>
+                        <option value="6.20">80 GSM (৳3100/রিম - ৳6.20/পাতা)</option>
+                        <option value="7.80">100 GSM (৳3900/রিম - ৳7.80/পাতা)</option>
+                    </select>
+                </div>
+            </div>
+            <div style="font-size:12.5px; color:#64748b; margin-top:6px;">
+                💡 <em>নোট: প্যাড ও স্লিপে শুধুমাত্র অফসেট পেপারে প্রিন্ট ও আঠা বাঁধাই হয়ে তৈরি হয় (আর্ট পেপার বা ডুপ্লিকেট কপি থাকে না)।</em>
             </div>
         </div>
 
@@ -1693,7 +1717,7 @@
             <div class="grid-3">
                 <div class="form-group">
                     <label>প্লেট ও মেশিনের টাইপ</label>
-                    <select id="pad_plateType" onchange="updatePadPlateDetails(true); checkMachineCapacityWarningFor('pad');">
+                    <select id="pad_plateType" onchange="updatePadPlateDetails(true); checkMachineCapacityWarningFor('pad'); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
                         <option value="mini_half">মিনি হাফ (10×16") [প্রিন্ট: 9×14"]</option>
                         <option value="hasi">হাসি (16×20") [প্রিন্ট: 11.5×18"]</option>
                         <option value="gto">GTO-জিটিও (15.75×21") [প্রিন্ট: 13.5×20"]</option>
@@ -1706,7 +1730,7 @@
                 </div>
                 <div class="form-group">
                     <label>রং/কালার সংখ্যা</label>
-                    <select id="pad_colorCount" onchange="updatePadPlateDetails(); checkMachineCapacityWarningFor('pad');">
+                    <select id="pad_colorCount" onchange="updatePadPlateDetails(); checkMachineCapacityWarningFor('pad'); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
                         <option value="1" selected>1 কালার (1 Color)</option>
                         <option value="2">2 কালার (2 Colors)</option>
                         <option value="3">3 কালার (3 Colors)</option>
@@ -1715,7 +1739,7 @@
                 </div>
                 <div class="form-group">
                     <label>আঠা বাঁধাই টাইপ</label>
-                    <select id="pad_bindingType" onchange="updatePadBindingRate()">
+                    <select id="pad_bindingType" onchange="updatePadBindingRate(); if(typeof calculatePadSlipCosting === 'function') calculatePadSlipCosting();">
                         <option value="pad_gum_standard" selected>প্যাড আঠা বাঁধাই (স্ট্যান্ডার্ড: ৳4)</option>
                         <option value="pad_gum_economic">ছোট স্লিপ আঠা বাঁধাই (৳3)</option>
                         <option value="pad_gum_heavy">বড় প্যাড / হেভি পাতা বাঁধাই (৳5-৳7)</option>
@@ -1811,28 +1835,8 @@
 
     <!-- 8. অটো কার্বন মেমো ছাপার হিসাব (মডিউল) -->
     <div id="autoCarbonCostingSection" style="display:none;">
-        <div class="section section-optional">
-            <div class="section-title">📑 1. অটো কার্বন পেপারের বিবরণী</div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>অটো কার্বন পেপার ব্র্যান্ড ও সাইজ</label>
-                    <select id="auto_paperCategory" onchange="updateAutoCarbonPaperOptions()">
-                        <option value="auto_bash_2336" selected>বসুন্ধরা অটোকার্বন (23 × 36")</option>
-                        <option value="auto_china_2336">চায়না অটোকার্বন (23 × 36")</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>কাগজের রেট ও প্রতি পাতার দর</label>
-                    <select id="auto_paperGsmRate" onchange="updateAutoCarbonPlateDetails()"></select>
-                </div>
-            </div>
-            <div style="font-size:12.5px; color:#0f766e; background:#f0fdfa; padding:8px 12px; border-radius:6px; border:1px solid #99f6e4; margin-top:6px;">
-                💡 <strong>বিশেষ জ্ঞাতব্য:</strong> <em>অটো কার্বন মেমোতে প্রতিটি পাতা নিজস্ব কার্বন ক্ষমতাসম্পন্ন উন্নত অটো কার্বন কাগজে ছাপা হয়।</em>
-            </div>
-        </div>
-
         <div class="section">
-            <div class="section-title">✂️ 2. মেমোর সাইজ ও বইয়ের বিবরণী</div>
+            <div class="section-title">✂️ 1. মেমোর সাইজ ও বইয়ের বিবরণী</div>
             <div class="grid-3">
                 <div class="form-group">
                     <label>অটো কার্বন সাইজ প্রিসেট</label>
@@ -1875,6 +1879,26 @@
             </div>
             <div id="auto_memoSetsInfo" style="font-size:13px; color:#1e3a8a; font-weight:600; background:#dbeafe; padding:8px 12px; border-radius:6px; margin-top:2px;">
                 📌 মোট 20টি মেমো বই (প্রতি বই 100 পাতা, সর্বমোট 2,000 পাতা)
+            </div>
+        </div>
+
+        <div class="section section-optional">
+            <div class="section-title">📑 2. অটো কার্বন পেপারের বিবরণী</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>অটো কার্বন পেপার ব্র্যান্ড ও সাইজ</label>
+                    <select id="auto_paperCategory" onchange="updateAutoCarbonPaperOptions()">
+                        <option value="auto_bash_2336" selected>বসুন্ধরা অটোকার্বন (23 × 36")</option>
+                        <option value="auto_china_2336">চায়না অটোকার্বন (23 × 36")</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>কাগজের রেট ও প্রতি পাতার দর</label>
+                    <select id="auto_paperGsmRate" onchange="updateAutoCarbonPlateDetails()"></select>
+                </div>
+            </div>
+            <div style="font-size:12.5px; color:#0f766e; background:#f0fdfa; padding:8px 12px; border-radius:6px; border:1px solid #99f6e4; margin-top:6px;">
+                💡 <strong>বিশেষ জ্ঞাতব্য:</strong> <em>অটো কার্বন মেমোতে প্রতিটি পাতা নিজস্ব কার্বন ক্ষমতাসম্পন্ন উন্নত অটো কার্বন কাগজে ছাপা হয়।</em>
             </div>
         </div>
 
@@ -1989,165 +2013,6 @@
                 </div>
                 <!-- 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট -->
                 <div id="auto_resMachineNoteBox" style="margin-top:14px; padding:12px 14px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; font-size:13.5px; color:#1e40af; line-height:1.6;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 9. অন্যান্য ছাপার হিসাব (মডিউল) -->
-    <div id="otherPrintingCostingSection" style="display:none;">
-        <div class="section section-optional">
-            <div class="section-title">📦 1. কাগজের মাপ ও দাম</div>
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>ফুল শিট লম্বা (ইঞ্চি)</label>
-                    <input type="number" id="oth_sheetLength" value="23" step="any">
-                </div>
-                <div class="form-group">
-                    <label>ফুল শিট চওড়া (ইঞ্চি)</label>
-                    <input type="number" id="oth_sheetWidth" value="36" step="any">
-                </div>
-                <div class="form-group">
-                    <label>প্রতি ফুল শিটের দাম (৳)</label>
-                    <input type="number" id="oth_sheetPrice" value="6.50" step="any">
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">✂️ 2. কাজের সাইজ ও মোট পরিমাণ</div>
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>কাটা পিস লম্বা (")</label>
-                    <input type="number" id="oth_cutLength" value="8.5" step="any">
-                </div>
-                <div class="form-group">
-                    <label>কাটা পিস চওড়া (")</label>
-                    <input type="number" id="oth_cutWidth" value="11" step="any">
-                </div>
-                <div class="form-group">
-                    <label>মোট পিস সংখ্যা</label>
-                    <input type="number" id="oth_totalQty" value="1000">
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">🖨️ 3. প্লেট, ছাপা ও আনুষঙ্গিক খরচ</div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>প্লেট ও মেশিনের টাইপ</label>
-                    <select id="oth_plateType" onchange="updateOtherPrintingPlateDetails(true); checkMachineCapacityWarningFor('oth');">
-                        <option value="mini_half">মিনি হাফ (10×16") [প্রিন্ট: 9×14"]</option>
-                        <option value="hasi">হাসি (16×20") [প্রিন্ট: 11.5×18"]</option>
-                        <option value="gto">GTO-জিটিও (15.75×21") [প্রিন্ট: 13.5×20"]</option>
-                        <option value="short_demi">শর্ট ডিমাই (20×22") [প্রিন্ট: 15×20"]</option>
-                        <option value="demi" selected>ডিমাই (21×25") [প্রিন্ট: 18×23"]</option>
-                        <option value="over_demi">ওভার ডিমাই (24×29") [প্রিন্ট: 20×28"]</option>
-                        <option value="dc_crown">D.C ডাবল ক্রাউন (22×31") [প্রিন্ট: 20×30"]</option>
-                        <option value="double_demi">ডাবল ডিমাই (29×36") [প্রিন্ট: 23×36"]</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>রং/কালার সংখ্যা</label>
-                    <select id="oth_colorCount" onchange="updateOtherPrintingPlateDetails(); checkMachineCapacityWarningFor('oth');">
-                        <option value="1" selected>1 কালার (1 Color)</option>
-                        <option value="2">2 কালার (2 Colors)</option>
-                        <option value="3">3 কালার (3 Colors)</option>
-                        <option value="4">4 কালার (4 Colors / মাল্টিকালার)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- ⚠️ ভুল মেশিন নির্বাচন সতর্কবার্তা (Warning Box) -->
-            <div id="oth_machineWarningBox" style="display:none; margin-bottom:15px; padding:12px 15px; background:#fef2f2; border:1.5px solid #f87171; border-radius:8px; color:#991b1b;"></div>
-
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>প্লেট খরচ মোট (৳)</label>
-                    <input type="number" id="oth_plateCost" value="300" step="any">
-                </div>
-                <div class="form-group">
-                    <label>ছাপা খরচ মোট (৳)</label>
-                    <input type="number" id="oth_printCost" value="500" step="any">
-                </div>
-            </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>লেমিনেশন / ফিনিশিং খরচ (৳)</label>
-                    <input type="number" id="oth_laminationCost" value="0" step="any">
-                </div>
-                <div class="form-group">
-                    <label>কাটিং, বাঁধাই ও অন্যান্য খরচ (৳)</label>
-                    <input type="number" id="oth_otherCost" value="100" step="any">
-                </div>
-            </div>
-
-            <!-- 💡 স্মার্ট মেশিন ও প্লেট সিলেকশন সাজেশন -->
-            <div id="oth_machineSuggestionBox" style="margin-top:16px; padding:14px; background:#f0fdf4; border:1.5px solid #86efac; border-radius:8px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:gap; gap:10px;">
-                    <div style="font-weight:bold; color:#166534; font-size:14px; display:flex; align-items:center; gap:6px;">
-                        <span>💡</span>
-                        <span>সেরা সাশ্রয়ী মেশিন ও সেটআপ সাজেশন:</span>
-                    </div>
-                    <button type="button" id="oth_btnApplyBestMachine" onclick="applyBestMachineSetupFor('oth')" style="background:#16a34a; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
-                        👉 সেরা মেশিনে সেট করুন
-                    </button>
-                </div>
-                <div id="oth_bestMachineSummary" style="margin-top:10px; font-size:13.5px; color:#14532d; line-height:1.6;"></div>
-                <div style="margin-top:10px; display:flex; justify-content:flex-end;">
-                    <button type="button" onclick="toggleMachineCompareTableFor('oth')" style="background:none; border:none; color:#0369a1; font-weight:600; text-decoration:underline; font-size:12.5px; cursor:pointer; padding:0;">
-                        📊 সকল মেশিনের তুলনামূলক খরচ তালিকা দেখুন / লুকান
-                    </button>
-                </div>
-                <div id="oth_machineCompareTable" style="display:none; margin-top:12px; overflow-x:auto;"></div>
-            </div>
-        </div>
-
-        <button class="btn-submit" onclick="calculateOtherPrintingCosting()">কস্টিং হিসাব করুন</button>
-
-        <div class="single-result-box" id="oth_resultBox">
-            <div id="oth_resultError" style="display:none; padding:15px; background:#fef2f2; border:2px solid #ef4444; border-radius:8px; color:#991b1b; margin-bottom:12px;"></div>
-            <div id="oth_resultContent">
-                <h3>📊 কস্টিং সামারি</h3>
-            <div class="result-item">
-                <span>এক শিটে বের হবে (Up):</span>
-                <span id="oth_resOutPerSheet">0 পিস</span>
-            </div>
-            <div class="result-item">
-                <span>মোট প্রয়োজনীয় কাগজ:</span>
-                <span id="oth_resTotalSheets">0 শিট</span>
-            </div>
-            <div class="divider-title">🛠️ খরচের বিস্তারিত বিবরণী:</div>
-            <div class="result-item">
-                <span>কাগজের মোট দাম:</span>
-                <span id="oth_resPaperCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>প্লেট খরচ:</span>
-                <span id="oth_resPlateCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>ছাপা খরচ:</span>
-                <span id="oth_resPrintCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>লেমিনেশন খরচ:</span>
-                <span id="oth_resLaminationCost">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>কাটিং ও অন্যান্য খরচ:</span>
-                <span id="oth_resOtherCost">৳ 0.00</span>
-            </div>
-            <div class="result-item total-row">
-                <span>সর্বমোট খরচ:</span>
-                <span id="oth_resGrandTotal" class="highlight-offset">৳ 0.00</span>
-            </div>
-            <div class="result-item">
-                <span>প্রতি পিসের গড় খরচ:</span>
-                <span id="oth_resPerUnitCost" style="font-weight:bold; color:#16a34a;">৳ 0.00</span>
-            </div>
-            <!-- 📌 মেশিন সেটআপ ও সাশ্রয়ী ছাপা হিসাবের বিস্তারিত নোট -->
-            <div id="oth_resMachineNoteBox" style="margin-top:14px; padding:12px 14px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; font-size:13.5px; color:#1e40af; line-height:1.6;"></div>
             </div>
         </div>
     </div>
